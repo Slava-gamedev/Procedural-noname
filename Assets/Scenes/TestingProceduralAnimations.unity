@@ -128,6 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2675617}
+  - component: {fileID: 2675618}
   m_Layer: 0
   m_Name: LeftLeg
   m_TagString: Untagged
@@ -151,6 +152,21 @@ Transform:
   - {fileID: 989154282}
   m_Father: {fileID: 245601050}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2675618
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2675616}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ade3833b0c2b85249acd65e937fdc68e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _footTarget: {fileID: 1040155193}
+  _thighPivot: {fileID: 989154282}
+  _shinPivot: {fileID: 2109922466}
 --- !u!1 &35704667
 GameObject:
   m_ObjectHideFlags: 0
@@ -639,6 +655,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _movementController: {fileID: 245601051}
+  _rightLeg: {fileID: 1457196693}
+  _leftLeg: {fileID: 2675618}
+  _stepLength: 0.2
 --- !u!1 &389229939
 GameObject:
   m_ObjectHideFlags: 0
@@ -983,6 +1002,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1457196692}
+  - component: {fileID: 1457196693}
   m_Layer: 0
   m_Name: RightLeg
   m_TagString: Untagged
@@ -1006,6 +1026,21 @@ Transform:
   - {fileID: 1376082336}
   m_Father: {fileID: 245601050}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1457196693
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1457196691}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ade3833b0c2b85249acd65e937fdc68e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _footTarget: {fileID: 1879405926}
+  _thighPivot: {fileID: 1376082336}
+  _shinPivot: {fileID: 389229940}
 --- !u!1 &1645069091
 GameObject:
   m_ObjectHideFlags: 0
