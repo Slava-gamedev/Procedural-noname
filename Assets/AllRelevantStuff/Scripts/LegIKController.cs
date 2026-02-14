@@ -85,6 +85,8 @@ namespace CharacterMovement
             float angleOffset = Mathf.Acos(cosThigh) * Mathf.Rad2Deg;
             float thighAngle = angleToTarget - angleOffset;
 
+            Debug.Log($"{_footTarget.gameObject},  thighAngle: {thighAngle},  shinAngle: {180 - kneeAngle}");
+
             _thighPivot.localRotation = Quaternion.Euler(0, 0, thighAngle);
             _shinPivot.localRotation = Quaternion.Euler(0, 0, 180 - kneeAngle);
         }
