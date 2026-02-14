@@ -4,6 +4,7 @@ namespace CharacterMovement
 {
     public class LegIKController : MonoBehaviour
     {
+        [SerializeField] private float _boneForwardOffset = 90f;
         [SerializeField] private Transform _footTarget;
         [SerializeField] private Transform _thighPivot;
         [SerializeField] private Transform _shinPivot;
@@ -11,13 +12,18 @@ namespace CharacterMovement
         [SerializeField] private float _stepDuration = 0.3f;
         [SerializeField] private float _stepHeight = 0.3f;
 
-        private Vector2 _startPosition;
-        private Vector2 _targetPosition;
+        [SerializeField, Range(0.4f, 1f)] private float _stepLengthRatio;
+
+        private Vector2 _vectorToTarget;
+        private Vector2 _startStepPosition;
+        private Vector2 _targetStepPosition;
         private float _elapsedTime;
 
         private float _thighLength;
         private float _shinLength;
 
+        public float MaxStepLength => FullLegLenght * _stepLengthRatio;
+        public float FullLegLenght => _thighLength + _shinLength;
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
 
@@ -25,13 +31,13 @@ namespace CharacterMovement
         {
             _thighLength = Vector2.Distance(_thighPivot.position, _shinPivot.position);
             _shinLength = Vector2.Distance(_shinPivot.position, _footTarget.position);
+            _vectorToTarget = GetCurrentDirectionToTarget();
         }
-
 
         public void StartStep(Vector2 targetPositon)
         {
-            _startPosition = CurrentFootPosition;
-            _targetPosition = targetPositon;
+            _startStepPosition = CurrentFootPosition;
+            _targetStepPosition = targetPositon;
             _elapsedTime = 0f;
             IsMoving = true;
         }
@@ -39,7 +45,14 @@ namespace CharacterMovement
         private void Update()
         {
             if (IsMoving)
+            {
                 StepUpdate();
+                return;
+            }
+            else if (!IsLegPositionedCorrectly())
+            {
+                UpdateInverseKinematics();
+            }
         }
 
         private void StepUpdate()
@@ -52,21 +65,21 @@ namespace CharacterMovement
         {
             _elapsedTime += Time.deltaTime;
             float timeParameter = _elapsedTime / _stepDuration;
-            Vector2 horizontalPosition = Vector2.Lerp(_startPosition, _targetPosition, timeParameter);
+            Vector2 horizontalPosition = Vector2.Lerp(_startStepPosition, _targetStepPosition, timeParameter);
             float heightOffset = Mathf.Sin(timeParameter * Mathf.PI) * _stepHeight;
 
             _footTarget.position = horizontalPosition + Vector2.up * heightOffset;
 
             if (timeParameter >= 1)
             {
-                _footTarget.position = _targetPosition;
+                _footTarget.position = _targetStepPosition;
                 IsMoving = false;
             }
         }
 
         private void UpdateInverseKinematics()
         {
-            Vector2 vectorToTarget = _footTarget.position - _thighPivot.position;
+            Vector2 vectorToTarget = CurrentFootPosition - (Vector2)_thighPivot.position;
             float distance = vectorToTarget.magnitude;
             distance = Mathf.Min(distance, _thighLength + _shinLength);
 
@@ -83,12 +96,22 @@ namespace CharacterMovement
             cosThigh = Mathf.Clamp(cosThigh, -1f, 1f);
 
             float angleOffset = Mathf.Acos(cosThigh) * Mathf.Rad2Deg;
-            float thighAngle = angleToTarget - angleOffset;
-
-            Debug.Log($"{_footTarget.gameObject},  thighAngle: {thighAngle},  shinAngle: {180 - kneeAngle}");
+            float thighAngle = angleToTarget - angleOffset + _boneForwardOffset;
 
             _thighPivot.localRotation = Quaternion.Euler(0, 0, thighAngle);
             _shinPivot.localRotation = Quaternion.Euler(0, 0, 180 - kneeAngle);
+            _vectorToTarget = GetCurrentDirectionToTarget();
+        }
+
+        private bool IsLegPositionedCorrectly()
+        {
+            return GetCurrentDirectionToTarget() == _vectorToTarget;
+        }
+
+        private Vector2 GetCurrentDirectionToTarget()
+        {
+            Vector2 vectorToTarget = CurrentFootPosition - (Vector2)_thighPivot.position;
+            return vectorToTarget;
         }
     }
 }

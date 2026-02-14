@@ -8,10 +8,8 @@ namespace CharacterMovement
         [SerializeField] private CharacterMovementController _movementController;
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
-        [SerializeField] private float _stepLength;
 
-        private Vector2 _newFootTargetPosition;
-        private LegIKController _footMovingLeg;
+        private LegIKController _steppingLeg;
         private System.Random _random;
 
         private void Start()
@@ -26,31 +24,36 @@ namespace CharacterMovement
             if (IsLegsAlreadyMoving())
                 return;
 
-            if(_footMovingLeg == null)
-                ChooseInitialFootMovingLeg();
+            _steppingLeg = ChooseLegToStep();
 
-            if(!IsFootTooFar())
+            if (_steppingLeg == null)
                 return;
 
-            CalculateNewFootPosition();
-            MoveLeg();
-            SwitchFootMovingLeg();
+            Vector2 targetPosition = CalculateTargetFootPosition(_steppingLeg);
+            _steppingLeg.StartStep(targetPosition);
         }
 
-        private bool IsFootTooFar()
+        private LegIKController ChooseLegToStep()
         {
-            float footDistanceFromBody = Vector2.Distance(transform.position, _footMovingLeg.CurrentFootPosition);
-            return footDistanceFromBody > _stepLength;
-        }
+            float rightDistance = Vector2.Distance(_rightLeg.transform.position, _rightLeg.CurrentFootPosition);
+            float leftDistance = Vector2.Distance(_leftLeg.transform.position, _leftLeg.CurrentFootPosition);
 
-        private void ChooseInitialFootMovingLeg()
-        {
-            _footMovingLeg = _random.TossACoin() ? _rightLeg : _leftLeg;
-        }
+            float rightThreshold = _rightLeg.MaxStepLength;
+            float leftThreshold = _leftLeg.MaxStepLength;
 
-        private void SwitchFootMovingLeg()
-        {
-            _footMovingLeg = _footMovingLeg == _leftLeg ? _rightLeg : _leftLeg;
+            bool rightNeedsStep = rightDistance > rightThreshold;
+            bool leftNeedsStep = leftDistance > leftThreshold;
+
+            if (rightNeedsStep && leftNeedsStep)
+            {
+                return _random.TossACoin() ? _rightLeg : _leftLeg;
+            }
+            else if (rightNeedsStep)
+                return _rightLeg;
+            else if (leftNeedsStep)
+                return _leftLeg;
+            else
+                return null;
         }
 
         private bool IsLegsAlreadyMoving()
@@ -63,22 +66,11 @@ namespace CharacterMovement
             return _movementController.CurrentSpeed > 0f;
         }
 
-        private void CalculateNewFootPosition()
+        private Vector2 CalculateTargetFootPosition(LegIKController leg)
         {
-            _newFootTargetPosition = _footMovingLeg.CurrentFootPosition;
-            Vector2 footPositionOffset = CalculateFootOffset();
-            _newFootTargetPosition += footPositionOffset;
-        }
-
-        private Vector2 CalculateFootOffset()
-        {
-            Vector2 footPositionOffset = _movementController.MovementDirection * _stepLength;
-            return footPositionOffset;
-        }
-
-        private void MoveLeg()
-        {
-            _footMovingLeg.StartStep(_newFootTargetPosition);
+            Vector2 footPositionOffset = _movementController.MovementDirection * _steppingLeg.MaxStepLength;
+            Vector2 target = leg.CurrentFootPosition + footPositionOffset;
+            return target;
         }
     }
 }
