@@ -12,8 +12,6 @@ namespace CharacterMovement
         [SerializeField] private float _stepDuration = 0.3f;
         [SerializeField] private float _stepHeight = 0.3f;
 
-        [SerializeField, Range(0.4f, 1f)] private float _stepLengthRatio;
-
         private Vector2 _vectorToTarget;
         private Vector2 _startStepPosition;
         private Vector2 _targetStepPosition;
@@ -22,7 +20,7 @@ namespace CharacterMovement
         private float _thighLength;
         private float _shinLength;
 
-        public float MaxStepLength => FullLegLenght * _stepLengthRatio;
+        public float MaxStepLength => FullLegLenght;
         public float FullLegLenght => _thighLength + _shinLength;
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
@@ -112,6 +110,14 @@ namespace CharacterMovement
         {
             Vector2 vectorToTarget = CurrentFootPosition - (Vector2)_thighPivot.position;
             return vectorToTarget;
+        }
+
+        [ContextMenu("CouldReachFootTarget")]
+        private void CouldReachFootTarget()
+        {
+            float distance = Vector2.Distance(CurrentFootPosition, _thighPivot.position);
+            bool couldReach = FullLegLenght >= distance;
+            Debug.Log($"CouldReachFootTarget: {couldReach}");
         }
     }
 }

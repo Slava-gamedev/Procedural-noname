@@ -46,7 +46,7 @@ namespace CharacterMovement
 
             if (rightNeedsStep && leftNeedsStep)
             {
-                return _random.TossACoin() ? _rightLeg : _leftLeg;
+                return rightDistance > leftDistance ? _rightLeg : _leftLeg;
             }
             else if (rightNeedsStep)
                 return _rightLeg;
@@ -68,8 +68,11 @@ namespace CharacterMovement
 
         private Vector2 CalculateTargetFootPosition(LegIKController leg)
         {
-            Vector2 footPositionOffset = _movementController.MovementDirection * _steppingLeg.MaxStepLength;
-            Vector2 target = leg.CurrentFootPosition + footPositionOffset;
+            Vector2 footPositionOffset = _movementController.MovementDirection * leg.MaxStepLength;
+
+            float targetX = leg.transform.position.x + _movementController.MovementDirection.x * leg.MaxStepLength;
+            float targetY = leg.CurrentFootPosition.y;
+            Vector2 target = new Vector2(targetX, targetY);
             return target;
         }
     }
