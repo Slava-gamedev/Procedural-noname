@@ -4,10 +4,12 @@ namespace CharacterMovement
 {
     public class CharacterMovementController : MonoBehaviour
     {
-        [SerializeField] private float _movementSpeed;
+        [SerializeField] private float _currentMovementSpeed;
+        [SerializeField] private float _maxMovementSpeed;
         private Vector2 _currentMovementDirection;
 
         public Vector2 MovementDirection => _currentMovementDirection;
+        public float MaxSpeed => _maxMovementSpeed;
         public float CurrentSpeed { get; private set; }
 
 
@@ -41,7 +43,7 @@ namespace CharacterMovement
                 return;
             }
 
-            CurrentSpeed = _movementSpeed;
+            CurrentSpeed = _currentMovementSpeed;
             float deltaTime = Time.deltaTime;
             Vector2 movementOffset = (deltaTime * CurrentSpeed) * _currentMovementDirection;
             transform.position += (Vector3)movementOffset;

@@ -1,4 +1,3 @@
-using ExtensionMethods;
 using UnityEngine;
 
 namespace CharacterMovement
@@ -9,13 +8,7 @@ namespace CharacterMovement
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
 
-        private LegIKController _steppingLeg;
-        private System.Random _random;
-
-        private void Start()
-        {
-            _random = new System.Random();
-        }
+        private LegIKController _lastSteppedLeg;
 
         void Update()
         {
@@ -24,29 +17,32 @@ namespace CharacterMovement
             if (IsLegsAlreadyMoving())
                 return;
 
-            _steppingLeg = ChooseLegToStep();
+            SetupLegs();
 
-            if (_steppingLeg == null)
+            LegIKController leg = ChooseLegToStep();
+
+            if (leg == null)
                 return;
 
-            Vector2 targetPosition = CalculateTargetFootPosition(_steppingLeg);
-            _steppingLeg.StartStep(targetPosition);
+            Vector2 targetPosition = CalculateTargetFootPosition(leg);
+            leg.StartStep(targetPosition);
+            _lastSteppedLeg = leg;
         }
 
         private LegIKController ChooseLegToStep()
         {
-            float rightDistance = Vector2.Distance(_rightLeg.transform.position, _rightLeg.CurrentFootPosition);
-            float leftDistance = Vector2.Distance(_leftLeg.transform.position, _leftLeg.CurrentFootPosition);
+            float rightDistance = Mathf.Abs(_rightLeg.ThighPivotPosition.x - _rightLeg.CurrentFootPosition.x);
+            float leftDistance = Mathf.Abs(_leftLeg.ThighPivotPosition.x - _leftLeg.CurrentFootPosition.x);
 
-            float rightThreshold = _rightLeg.MaxStepLength;
-            float leftThreshold = _leftLeg.MaxStepLength;
+            float rightThreshold = _rightLeg.StepTriggerDistance;
+            float leftThreshold = _leftLeg.StepTriggerDistance;
 
             bool rightNeedsStep = rightDistance > rightThreshold;
             bool leftNeedsStep = leftDistance > leftThreshold;
 
             if (rightNeedsStep && leftNeedsStep)
             {
-                return rightDistance > leftDistance ? _rightLeg : _leftLeg;
+                return _lastSteppedLeg == _rightLeg ? _leftLeg : _rightLeg;
             }
             else if (rightNeedsStep)
                 return _rightLeg;
@@ -68,12 +64,19 @@ namespace CharacterMovement
 
         private Vector2 CalculateTargetFootPosition(LegIKController leg)
         {
-            Vector2 footPositionOffset = _movementController.MovementDirection * leg.MaxStepLength;
-
-            float targetX = leg.transform.position.x + _movementController.MovementDirection.x * leg.MaxStepLength;
+            float targetX = leg.ThighPivotPosition.x + _movementController.MovementDirection.x * leg.StepLength;
             float targetY = leg.CurrentFootPosition.y;
             Vector2 target = new Vector2(targetX, targetY);
             return target;
+        }
+
+        private void SetupLegs()
+        {
+            float speedFactor = _movementController.CurrentSpeed / _movementController.MaxSpeed;
+            speedFactor = Mathf.Clamp01(speedFactor);
+
+            _rightLeg.SetStepParameters(speedFactor);
+            _leftLeg.SetStepParameters(speedFactor);
         }
     }
 }

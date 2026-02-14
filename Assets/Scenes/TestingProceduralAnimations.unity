@@ -168,9 +168,13 @@ MonoBehaviour:
   _footTarget: {fileID: 1040155193}
   _thighPivot: {fileID: 989154282}
   _shinPivot: {fileID: 2109922466}
-  _stepDuration: 0.5
   _stepHeight: 0.3
-  _stepLengthRatio: 0.7
+  _minStepDuration: 0.2
+  _maxStepDuration: 0.5
+  _minStrideFactor: 0.5
+  _maxStrideFactor: 0.9
+  _minStepTriggerFactor: 0.3
+  _maxStepTriggerFactor: 0.5
 --- !u!1 &193488232
 GameObject:
   m_ObjectHideFlags: 0
@@ -468,7 +472,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa908e02fa8efee45ae75b34622a1db6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _movementSpeed: 2
+  _currentMovementSpeed: 2
+  _maxMovementSpeed: 5
 --- !u!114 &245601052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1013,9 +1018,13 @@ MonoBehaviour:
   _footTarget: {fileID: 1879405926}
   _thighPivot: {fileID: 2020170245}
   _shinPivot: {fileID: 1208866194}
-  _stepDuration: 0.5
   _stepHeight: 0.3
-  _stepLengthRatio: 0.7
+  _minStepDuration: 0.2
+  _maxStepDuration: 0.5
+  _minStrideFactor: 0.5
+  _maxStrideFactor: 0.9
+  _minStepTriggerFactor: 0.3
+  _maxStepTriggerFactor: 0.5
 --- !u!1 &1645069091
 GameObject:
   m_ObjectHideFlags: 0

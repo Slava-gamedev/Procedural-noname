@@ -9,27 +9,45 @@ namespace CharacterMovement
         [SerializeField] private Transform _thighPivot;
         [SerializeField] private Transform _shinPivot;
 
-        [SerializeField] private float _stepDuration = 0.3f;
         [SerializeField] private float _stepHeight = 0.3f;
 
+        [SerializeField] private float _minStepDuration;
+        [SerializeField] private float _maxStepDuration;
+        [SerializeField] private float _minStrideFactor;
+        [SerializeField] private float _maxStrideFactor;
+        [SerializeField] private float _minStepTriggerFactor;
+        [SerializeField] private float _maxStepTriggerFactor;
+
+        private float _currentStepDuration;
+        private float _currentStrideFactor;
+        private float _stepTriggerFactor;
+        private float _elapsedTime;
+        private float _thighLength;
+        private float _shinLength;
         private Vector2 _vectorToTarget;
         private Vector2 _startStepPosition;
         private Vector2 _targetStepPosition;
-        private float _elapsedTime;
+        private float _fullLegLenght => _thighLength + _shinLength;
 
-        private float _thighLength;
-        private float _shinLength;
-
-        public float MaxStepLength => FullLegLenght;
-        public float FullLegLenght => _thighLength + _shinLength;
+        public float StepTriggerDistance => StepLength * _stepTriggerFactor;
+        public float StepLength => _fullLegLenght * _currentStrideFactor;
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
+        public Vector2 ThighPivotPosition => _thighPivot.position;
+
 
         private void Awake()
         {
             _thighLength = Vector2.Distance(_thighPivot.position, _shinPivot.position);
             _shinLength = Vector2.Distance(_shinPivot.position, _footTarget.position);
             _vectorToTarget = GetCurrentDirectionToTarget();
+        }
+
+        public void SetStepParameters(float speedFactor)
+        {
+            _currentStepDuration = Mathf.Lerp(_maxStepDuration, _minStepDuration, speedFactor);
+            _currentStrideFactor = Mathf.Lerp(_minStrideFactor, _maxStrideFactor, speedFactor);
+            _stepTriggerFactor = Mathf.Lerp(_maxStepTriggerFactor, _minStepTriggerFactor, speedFactor);
         }
 
         public void StartStep(Vector2 targetPositon)
@@ -62,7 +80,7 @@ namespace CharacterMovement
         private void UpdateFootPosition()
         {
             _elapsedTime += Time.deltaTime;
-            float timeParameter = _elapsedTime / _stepDuration;
+            float timeParameter = _elapsedTime / _currentStepDuration;
             Vector2 horizontalPosition = Vector2.Lerp(_startStepPosition, _targetStepPosition, timeParameter);
             float heightOffset = Mathf.Sin(timeParameter * Mathf.PI) * _stepHeight;
 
@@ -110,14 +128,6 @@ namespace CharacterMovement
         {
             Vector2 vectorToTarget = CurrentFootPosition - (Vector2)_thighPivot.position;
             return vectorToTarget;
-        }
-
-        [ContextMenu("CouldReachFootTarget")]
-        private void CouldReachFootTarget()
-        {
-            float distance = Vector2.Distance(CurrentFootPosition, _thighPivot.position);
-            bool couldReach = FullLegLenght >= distance;
-            Debug.Log($"CouldReachFootTarget: {couldReach}");
         }
     }
 }
