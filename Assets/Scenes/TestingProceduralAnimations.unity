@@ -171,8 +171,6 @@ MonoBehaviour:
   _stepHeight: 0.3
   _minStepDuration: 0.2
   _maxStepDuration: 0.5
-  _minStrideFactor: 0.5
-  _maxStrideFactor: 0.9
   _minStepTriggerFactor: 0.3
   _maxStepTriggerFactor: 0.5
 --- !u!1 &193488232
@@ -291,7 +289,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: -5, z: 0}
-  m_LocalScale: {x: 20, y: 1, z: 1}
+  m_LocalScale: {x: 50, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1299305972}
@@ -554,7 +552,7 @@ CapsuleCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.6}
+  m_Offset: {x: 0, y: -0.58}
   m_Size: {x: 1.2, y: 2.35}
   m_Direction: 0
 --- !u!1 &425177013
@@ -1089,8 +1087,6 @@ MonoBehaviour:
   _stepHeight: 0.3
   _minStepDuration: 0.2
   _maxStepDuration: 0.5
-  _minStrideFactor: 0.5
-  _maxStrideFactor: 0.9
   _minStepTriggerFactor: 0.3
   _maxStepTriggerFactor: 0.5
 --- !u!1 &1645069091

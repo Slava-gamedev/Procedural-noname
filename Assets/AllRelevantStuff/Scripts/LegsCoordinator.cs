@@ -12,8 +12,9 @@ namespace CharacterMovement
 
         void Update()
         {
-            if(!IsBodyMoving())
+            if (!IsBodyMoving())
                 return;
+
             if (IsLegsAlreadyMoving())
                 return;
 
@@ -42,7 +43,7 @@ namespace CharacterMovement
 
             if (rightNeedsStep && leftNeedsStep)
             {
-                return _lastSteppedLeg == _rightLeg ? _leftLeg : _rightLeg;
+                return GetOppositeLeg();
             }
             else if (rightNeedsStep)
                 return _rightLeg;
@@ -64,9 +65,30 @@ namespace CharacterMovement
 
         private Vector2 CalculateTargetFootPosition(LegIKController leg)
         {
-            float targetX = leg.ThighPivotPosition.x + _movementController.MovementDirection.x * leg.StepLength;
+            float direction = _movementController.MovementDirection.x;
+            float predictionMultiplier = 1.05f; // 5% extra
+            float stepLength = leg.CalculateStepLength(_movementController.CurrentSpeed);
+            stepLength = stepLength * predictionMultiplier;
+
+            Vector2 predictedThighPivot = leg.ThighPivotPosition
+                             + _movementController.MovementDirection
+                             * _movementController.CurrentSpeed * leg.CurrentStepDuration;
+
+            float targetX = predictedThighPivot.x + direction * stepLength;
             float targetY = leg.CurrentFootPosition.y;
             Vector2 target = new Vector2(targetX, targetY);
+
+            float distance = Vector2.Distance(predictedThighPivot, target);
+            float legLength = leg.FullLegLenght; 
+
+            if (distance > legLength)
+            {
+                float height = Mathf.Abs(predictedThighPivot.y - targetY);
+                float xMax = Mathf.Sqrt(legLength * legLength - height * height);
+                targetX = predictedThighPivot.x + direction * xMax;
+                target = new Vector2(targetX, targetY);
+            }
+
             return target;
         }
 
@@ -77,6 +99,11 @@ namespace CharacterMovement
 
             _rightLeg.SetStepParameters(speedFactor);
             _leftLeg.SetStepParameters(speedFactor);
+        }
+
+        private LegIKController GetOppositeLeg()
+        {
+            return _lastSteppedLeg == _rightLeg ? _leftLeg : _rightLeg;
         }
     }
 }

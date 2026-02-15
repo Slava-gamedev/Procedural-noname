@@ -13,13 +13,10 @@ namespace CharacterMovement
 
         [SerializeField] private float _minStepDuration;
         [SerializeField] private float _maxStepDuration;
-        [SerializeField] private float _minStrideFactor;
-        [SerializeField] private float _maxStrideFactor;
         [SerializeField] private float _minStepTriggerFactor;
         [SerializeField] private float _maxStepTriggerFactor;
 
         private float _currentStepDuration;
-        private float _currentStrideFactor;
         private float _stepTriggerFactor;
         private float _elapsedTime;
         private float _thighLength;
@@ -27,10 +24,10 @@ namespace CharacterMovement
         private Vector2 _vectorToTarget;
         private Vector2 _startStepPosition;
         private Vector2 _targetStepPosition;
-        private float _fullLegLenght => _thighLength + _shinLength;
 
-        public float StepTriggerDistance => StepLength * _stepTriggerFactor;
-        public float StepLength => _fullLegLenght * _currentStrideFactor;
+        public float CurrentStepDuration => _currentStepDuration;
+        public float FullLegLenght => _thighLength + _shinLength;
+        public float StepTriggerDistance => FullLegLenght * _stepTriggerFactor;
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
         public Vector2 ThighPivotPosition => _thighPivot.position;
@@ -43,10 +40,14 @@ namespace CharacterMovement
             _vectorToTarget = GetCurrentDirectionToTarget();
         }
 
+        public float CalculateStepLength(float velocity)
+        {
+            return velocity * _currentStepDuration;
+        }
+
         public void SetStepParameters(float speedFactor)
         {
             _currentStepDuration = Mathf.Lerp(_maxStepDuration, _minStepDuration, speedFactor);
-            _currentStrideFactor = Mathf.Lerp(_minStrideFactor, _maxStrideFactor, speedFactor);
             _stepTriggerFactor = Mathf.Lerp(_maxStepTriggerFactor, _minStepTriggerFactor, speedFactor);
         }
 
