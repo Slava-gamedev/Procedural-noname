@@ -4,8 +4,12 @@ namespace CharacterMovement
 {
     public class CharacterMovementController : MonoBehaviour
     {
-        [SerializeField] private float _currentMovementSpeed;
         [SerializeField] private float _maxMovementSpeed;
+        [SerializeField] private float _acceleration;
+        [SerializeField] private float _deceleration;
+        [SerializeField] private Rigidbody2D _rigidbody;
+
+
         private Vector2 _currentMovementDirection;
 
         public Vector2 MovementDirection => _currentMovementDirection;
@@ -16,6 +20,10 @@ namespace CharacterMovement
         void Update()
         {
             CheckForInput();
+        }
+
+        private void FixedUpdate()
+        {
             Move();
         }
 
@@ -37,16 +45,21 @@ namespace CharacterMovement
 
         private void Move()
         {
-            if(_currentMovementDirection == Vector2.zero)
-            {
-                CurrentSpeed = 0;
-                return;
-            }
+            float targetSpeed = _currentMovementDirection.x * _maxMovementSpeed;
 
-            CurrentSpeed = _currentMovementSpeed;
-            float deltaTime = Time.deltaTime;
-            Vector2 movementOffset = (deltaTime * CurrentSpeed) * _currentMovementDirection;
-            transform.position += (Vector3)movementOffset;
+            float accelRate = (_currentMovementDirection.x != 0)
+                ? _acceleration
+                : _deceleration;
+
+            float newVelocityX = Mathf.MoveTowards(
+                _rigidbody.linearVelocityX,
+                targetSpeed,
+                accelRate * Time.fixedDeltaTime
+            );
+
+            _rigidbody.linearVelocity = new Vector2(newVelocityX, _rigidbody.linearVelocityY);
+
+            CurrentSpeed = Mathf.Abs(_rigidbody.linearVelocityX);
         }
     }
 }
