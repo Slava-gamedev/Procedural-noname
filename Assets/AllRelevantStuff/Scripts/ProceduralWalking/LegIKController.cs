@@ -15,11 +15,11 @@ namespace CharacterMovement
         private float _elapsedTime;
         private float _thighLength;
         private float _shinLength;
-        private Vector2 _vectorToTarget;
+        private Vector2 _cachedDirectionToTarget;
         private Vector2 _startStepPosition;
         private Vector2 _targetStepPosition;
 
-        public float FullLegLenght => _thighLength + _shinLength;
+        public float FullLegLength => _thighLength + _shinLength;
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
         public Vector2 ThighPivotPosition => _thighPivot.position;
@@ -30,7 +30,7 @@ namespace CharacterMovement
         {
             _thighLength = Vector2.Distance(_thighPivot.position, _shinPivot.position);
             _shinLength = Vector2.Distance(_shinPivot.position, _footTarget.position);
-            _vectorToTarget = GetCurrentDirectionToTarget();
+            _cachedDirectionToTarget = GetCurrentDirectionToTarget();
         }
 
         public void StartStep(Vector2 targetPositon, float stepDuration)
@@ -51,7 +51,7 @@ namespace CharacterMovement
                 StepUpdate();
                 return;
             }
-            else if (!IsLegPositionedCorrectly())
+            else if (!IsLegAlignedWithTarget())
             {
                 UpdateInverseKinematics();
             }
@@ -81,33 +81,58 @@ namespace CharacterMovement
 
         private void UpdateInverseKinematics()
         {
-            Vector2 vectorToTarget = CurrentFootPosition - (Vector2)_thighPivot.position;
-            float distance = vectorToTarget.magnitude;
-            distance = Mathf.Min(distance, FullLegLenght);
+            Vector2 toTarget = GetCurrentDirectionToTarget();
+            float distance = Mathf.Min(toTarget.magnitude, FullLegLength);
 
+            float thighAngle = CalculateThighAngle(toTarget, distance);
+            float shinAngle = CalculateShinAngle(distance);
+
+            _thighPivot.localRotation = Quaternion.Euler(0, 0, thighAngle);
+            _shinPivot.localRotation = Quaternion.Euler(0, 0, shinAngle);
+            _cachedDirectionToTarget = GetCurrentDirectionToTarget();
+        }
+
+        private float CalculateThighAngle(Vector2 toTarget, float distance)
+        {
             float a = _thighLength;
             float b = _shinLength;
             float c = distance;
 
-            float cosKnee = (a * a + b * b - c * c) / (2 * a * b);
-            cosKnee = Mathf.Clamp(cosKnee, -1f, 1f);
-            float kneeAngle = Mathf.Acos(cosKnee) * Mathf.Rad2Deg;
+            float angleToTarget =
+                Mathf.Atan2(toTarget.y, toTarget.x) * Mathf.Rad2Deg;
 
-            float angleToTarget = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
-            float cosThigh = (a * a + c * c - b * b) / (2 * a * c);
+            float cosThigh =
+                (a * a + c * c - b * b) / (2f * a * c);
+
             cosThigh = Mathf.Clamp(cosThigh, -1f, 1f);
 
-            float angleOffset = Mathf.Acos(cosThigh) * Mathf.Rad2Deg;
-            float thighAngle = angleToTarget + (angleOffset * _angleDirectionModifier) + _boneForwardOffset;
+            float offset =
+                Mathf.Acos(cosThigh) * Mathf.Rad2Deg;
 
-            _thighPivot.localRotation = Quaternion.Euler(0, 0, thighAngle);
-            _shinPivot.localRotation = Quaternion.Euler(0, 0, (180 - kneeAngle) * (_angleDirectionModifier * -1f));
-            _vectorToTarget = GetCurrentDirectionToTarget();
+            float thighAngle = angleToTarget + (offset * _angleDirectionModifier) + _boneForwardOffset;
+
+            return thighAngle;
         }
 
-        private bool IsLegPositionedCorrectly()
+        private float CalculateShinAngle(float distance)
         {
-            return Vector2.Distance(GetCurrentDirectionToTarget(), _vectorToTarget) < 0.0001f;
+            float a = _thighLength;
+            float b = _shinLength;
+            float c = distance;
+
+            float cosKnee = (a * a + b * b - c * c) / (2f * a * b);
+
+            cosKnee = Mathf.Clamp(cosKnee, -1f, 1f);
+
+            float kneeAngle =
+                Mathf.Acos(cosKnee) * Mathf.Rad2Deg;
+
+            return (180f - kneeAngle) * (_angleDirectionModifier * -1f);
+        }
+
+        private bool IsLegAlignedWithTarget()
+        {
+            return Vector2.Distance(GetCurrentDirectionToTarget(), _cachedDirectionToTarget) < 0.0001f;
         }
 
         private Vector2 GetCurrentDirectionToTarget()

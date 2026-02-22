@@ -4,17 +4,18 @@ namespace CharacterMovement
 {
     public class CharacterMovementController : MonoBehaviour
     {
+        private const float kSpeedThreshold = 0.2f;
+
         [SerializeField] private float _maxMovementSpeed;
         [SerializeField] private float _acceleration;
         [SerializeField] private float _deceleration;
         [SerializeField] private Rigidbody2D _rigidbody;
         [SerializeField] private float _cycleFrequency = 1f;
         [SerializeField] private SpriteRenderer _bodySprite;
-
-        private Vector2 _currentMovementDirection;
+        private Vector2 _movementDirection;
 
         public float LocomotionCycle {  get; private set; }
-        public Vector2 MovementDirection => _currentMovementDirection;
+        public Vector2 MovementDirection => _movementDirection;
         public float MaxSpeed => _maxMovementSpeed;
         public float CurrentAbsoluteSpeed { get; private set; }
         public float CurrentSignedSpeed { get; private set; }
@@ -22,7 +23,7 @@ namespace CharacterMovement
 
         void Update()
         {
-            CheckForInput();
+            ReadInput();
             UpdateLocomotionCycle();
         }
 
@@ -31,29 +32,29 @@ namespace CharacterMovement
             Move();
         }
 
-        private void CheckForInput()
+        private void ReadInput()
         {
+            float horizontalInput = 0f;
+
             if (Input.GetKey(KeyCode.RightArrow))
             {
-                _currentMovementDirection = Vector2.right;
-                _bodySprite.flipX = true;
+                horizontalInput = 1f;
             }
             else if (Input.GetKey(KeyCode.LeftArrow))
             {
-                _currentMovementDirection = Vector2.left;
-                _bodySprite.flipX = false;
+                horizontalInput = -1f;
             }
-            else
-            {
-                _currentMovementDirection = Vector2.zero;
-            }
+
+            _movementDirection = new Vector2(horizontalInput, 0f);
+
+            UpdateSpriteOrientation(horizontalInput);
         }
 
         private void Move()
         {
-            float targetSpeed = _currentMovementDirection.x * _maxMovementSpeed;
+            float targetSpeed = _movementDirection.x * _maxMovementSpeed;
 
-            float accelRate = (_currentMovementDirection.x != 0)
+            float accelRate = (_movementDirection.x != 0)
                 ? _acceleration
                 : _deceleration;
 
@@ -71,9 +72,24 @@ namespace CharacterMovement
 
         private void UpdateLocomotionCycle()
         {
+            if (CurrentAbsoluteSpeed < kSpeedThreshold)
+            {
+                return;
+            }
+
             float deltaPhase = CurrentAbsoluteSpeed * _cycleFrequency * Time.deltaTime;
             LocomotionCycle += deltaPhase;
             LocomotionCycle = Mathf.Repeat(LocomotionCycle, 1);
+        }
+
+        private void UpdateSpriteOrientation(float horizontalInput)
+        {
+            if(horizontalInput == 0)
+            {
+                return;
+            }
+
+            _bodySprite.flipX = horizontalInput > 0;
         }
     }
 }
