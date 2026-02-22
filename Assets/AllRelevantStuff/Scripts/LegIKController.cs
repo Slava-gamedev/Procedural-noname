@@ -11,13 +11,7 @@ namespace CharacterMovement
 
         [SerializeField] private float _stepHeight = 0.3f;
 
-        [SerializeField] private float _minStepDuration;
-        [SerializeField] private float _maxStepDuration;
-        [SerializeField] private float _minStepTriggerFactor;
-        [SerializeField] private float _maxStepTriggerFactor;
-
         private float _currentStepDuration;
-        private float _stepTriggerFactor;
         private float _elapsedTime;
         private float _thighLength;
         private float _shinLength;
@@ -25,9 +19,7 @@ namespace CharacterMovement
         private Vector2 _startStepPosition;
         private Vector2 _targetStepPosition;
 
-        public float CurrentStepDuration => _currentStepDuration;
         public float FullLegLenght => _thighLength + _shinLength;
-        public float StepTriggerDistance => FullLegLenght * _stepTriggerFactor;
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
         public Vector2 ThighPivotPosition => _thighPivot.position;
@@ -40,19 +32,9 @@ namespace CharacterMovement
             _vectorToTarget = GetCurrentDirectionToTarget();
         }
 
-        public float CalculateStepLength(float velocity)
+        public void StartStep(Vector2 targetPositon, float stepDuration)
         {
-            return velocity * _currentStepDuration;
-        }
-
-        public void SetStepParameters(float speedFactor)
-        {
-            _currentStepDuration = Mathf.Lerp(_maxStepDuration, _minStepDuration, speedFactor);
-            _stepTriggerFactor = Mathf.Lerp(_maxStepTriggerFactor, _minStepTriggerFactor, speedFactor);
-        }
-
-        public void StartStep(Vector2 targetPositon)
-        {
+            _currentStepDuration = stepDuration;
             _startStepPosition = CurrentFootPosition;
             _targetStepPosition = targetPositon;
             _elapsedTime = 0f;
@@ -122,7 +104,7 @@ namespace CharacterMovement
 
         private bool IsLegPositionedCorrectly()
         {
-            return GetCurrentDirectionToTarget() == _vectorToTarget;
+            return Vector2.Distance(GetCurrentDirectionToTarget(), _vectorToTarget) < 0.0001f;
         }
 
         private Vector2 GetCurrentDirectionToTarget()

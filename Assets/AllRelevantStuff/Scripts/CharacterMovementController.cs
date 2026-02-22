@@ -8,18 +8,21 @@ namespace CharacterMovement
         [SerializeField] private float _acceleration;
         [SerializeField] private float _deceleration;
         [SerializeField] private Rigidbody2D _rigidbody;
-
+        [SerializeField] private float _cycleFrequency = 1f;
 
         private Vector2 _currentMovementDirection;
 
+        public float LocomotionCycle {  get; private set; }
         public Vector2 MovementDirection => _currentMovementDirection;
         public float MaxSpeed => _maxMovementSpeed;
-        public float CurrentSpeed { get; private set; }
-
+        public float CurrentAbsoluteSpeed { get; private set; }
+        public float CurrentSignedSpeed { get; private set; }
+        public float CycleFrequency => _cycleFrequency;
 
         void Update()
         {
             CheckForInput();
+            UpdateLocomotionCycle();
         }
 
         private void FixedUpdate()
@@ -59,7 +62,15 @@ namespace CharacterMovement
 
             _rigidbody.linearVelocity = new Vector2(newVelocityX, _rigidbody.linearVelocityY);
 
-            CurrentSpeed = Mathf.Abs(_rigidbody.linearVelocityX);
+            CurrentAbsoluteSpeed = Mathf.Abs(_rigidbody.linearVelocityX);
+            CurrentSignedSpeed = _rigidbody.linearVelocityX;
+        }
+
+        private void UpdateLocomotionCycle()
+        {
+            float deltaPhase = CurrentAbsoluteSpeed * _cycleFrequency * Time.deltaTime;
+            LocomotionCycle += deltaPhase;
+            LocomotionCycle = Mathf.Repeat(LocomotionCycle, 1);
         }
     }
 }

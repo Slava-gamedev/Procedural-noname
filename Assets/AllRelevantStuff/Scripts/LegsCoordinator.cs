@@ -4,106 +4,98 @@ namespace CharacterMovement
 {
     public class LegsCoordinator : MonoBehaviour
     {
+        private const float kSpeedThreshold = 0.05f;
+        private const float kStanceEnd = 0.5f;
+
         [SerializeField] private CharacterMovementController _movementController;
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
 
         private LegIKController _lastSteppedLeg;
+        private float _previousCycle;
 
         void Update()
         {
-            if (!IsBodyMoving())
-                return;
-
-            if (IsLegsAlreadyMoving())
-                return;
-
-            SetupLegs();
-
-            LegIKController leg = ChooseLegToStep();
-
-            if (leg == null)
-                return;
-
-            Vector2 targetPosition = CalculateTargetFootPosition(leg);
-            leg.StartStep(targetPosition);
-            _lastSteppedLeg = leg;
-        }
-
-        private LegIKController ChooseLegToStep()
-        {
-            float rightDistance = Mathf.Abs(_rightLeg.ThighPivotPosition.x - _rightLeg.CurrentFootPosition.x);
-            float leftDistance = Mathf.Abs(_leftLeg.ThighPivotPosition.x - _leftLeg.CurrentFootPosition.x);
-
-            float rightThreshold = _rightLeg.StepTriggerDistance;
-            float leftThreshold = _leftLeg.StepTriggerDistance;
-
-            bool rightNeedsStep = rightDistance > rightThreshold;
-            bool leftNeedsStep = leftDistance > leftThreshold;
-
-            if (rightNeedsStep && leftNeedsStep)
+            if(!IsMoving())
             {
-                return GetOppositeLeg();
+                _previousCycle = _movementController.LocomotionCycle;
+                return;
             }
-            else if (rightNeedsStep)
-                return _rightLeg;
-            else if (leftNeedsStep)
-                return _leftLeg;
-            else
-                return null;
+
+            HandleLegCycle();
+
+            _previousCycle = _movementController.LocomotionCycle;
         }
 
-        private bool IsLegsAlreadyMoving()
+        private void HandleLegCycle() // TODO
         {
-            return _rightLeg.IsMoving || _leftLeg.IsMoving;
+            float currentCycle = _movementController.LocomotionCycle;
+
+            float currentRightLegCycle = currentCycle;
+            float currentLeftLegCycle = (currentCycle + 0.5f) % 1f;
+
+            float previousRightLegCycle = _previousCycle;
+            float previousLeftLegCycle = (_previousCycle + 0.5f) % 1f;
+
+
+            TryStepLeg(previousRightLegCycle, currentRightLegCycle, _rightLeg);
+
+            TryStepLeg(previousLeftLegCycle, currentLeftLegCycle, _leftLeg);
         }
 
-        private bool IsBodyMoving()
+        private void TryStepLeg(float previousCycle, float currentCycle, LegIKController leg)
         {
-            return _movementController.CurrentSpeed > 0f;
-        }
-
-        private Vector2 CalculateTargetFootPosition(LegIKController leg)
-        {
-            float direction = _movementController.MovementDirection.x;
-            float predictionMultiplier = 1.05f; // 5% extra
-            float stepLength = leg.CalculateStepLength(_movementController.CurrentSpeed);
-            stepLength = stepLength * predictionMultiplier;
-
-            Vector2 predictedThighPivot = leg.ThighPivotPosition
-                             + _movementController.MovementDirection
-                             * _movementController.CurrentSpeed * leg.CurrentStepDuration;
-
-            float targetX = predictedThighPivot.x + direction * stepLength;
-            float targetY = leg.CurrentFootPosition.y;
-            Vector2 target = new Vector2(targetX, targetY);
-
-            float distance = Vector2.Distance(predictedThighPivot, target);
-            float legLength = leg.FullLegLenght; 
-
-            if (distance > legLength)
+            if (HasEnteredSwing(previousCycle, currentCycle) && !leg.IsMoving)
             {
-                float height = Mathf.Abs(predictedThighPivot.y - targetY);
-                float xMax = Mathf.Sqrt(legLength * legLength - height * height);
-                targetX = predictedThighPivot.x + direction * xMax;
-                target = new Vector2(targetX, targetY);
+                float stepDuration = CalculateStepDuration();
+                Vector2 stepTarget = CalculateStepTarget(leg, stepDuration);
+                leg.StartStep(stepTarget, stepDuration);
             }
+        }
+
+        private bool HasEnteredSwing(float previousCycle, float currentCycle)
+        {
+            if(previousCycle <= kStanceEnd && currentCycle >= kStanceEnd)
+            {
+                return true;
+            }
+
+            if (previousCycle > currentCycle)
+            {
+                return previousCycle <= kStanceEnd || currentCycle >= kStanceEnd;
+            }
+
+            return false;
+        }
+
+
+        private Vector2 CalculateStepTarget(LegIKController leg, float stepDuration)
+        {
+            float direction = Mathf.Sign(_movementController.CurrentSignedSpeed);
+            float stepLength = _movementController.CurrentAbsoluteSpeed * stepDuration;
+
+            Vector2 pelvisPos = leg.ThighPivotPosition;
+            Vector2 target = pelvisPos + Vector2.right * direction * stepLength;
+            target.y = leg.CurrentFootPosition.y;
 
             return target;
         }
 
-        private void SetupLegs()
+        private float CalculateStepDuration()
         {
-            float speedFactor = _movementController.CurrentSpeed / _movementController.MaxSpeed;
-            speedFactor = Mathf.Clamp01(speedFactor);
+            float cycleSpeed = _movementController.CurrentAbsoluteSpeed
+                      * _movementController.CycleFrequency;
 
-            _rightLeg.SetStepParameters(speedFactor);
-            _leftLeg.SetStepParameters(speedFactor);
+            if (cycleSpeed <= 0.0001f)
+                return 0.2f;
+
+            float swingPhaseLength = 0.5f;
+            return swingPhaseLength / cycleSpeed;
         }
 
-        private LegIKController GetOppositeLeg()
+        private bool IsMoving()
         {
-            return _lastSteppedLeg == _rightLeg ? _leftLeg : _rightLeg;
+            return _movementController.CurrentAbsoluteSpeed > kSpeedThreshold;
         }
     }
 }
