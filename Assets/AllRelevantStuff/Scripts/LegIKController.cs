@@ -23,7 +23,7 @@ namespace CharacterMovement
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
         public Vector2 ThighPivotPosition => _thighPivot.position;
-
+        public Vector2 TargetFootPosition => _targetStepPosition;
 
         private void Awake()
         {

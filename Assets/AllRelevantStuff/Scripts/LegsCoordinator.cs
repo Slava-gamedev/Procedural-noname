@@ -1,10 +1,11 @@
+using ExtensionMethods;
 using UnityEngine;
 
 namespace CharacterMovement
 {
     public class LegsCoordinator : MonoBehaviour
     {
-        private const float kSpeedThreshold = 0.05f;
+        private const float kSpeedThreshold = 0.1f;
         private const float kStanceEnd = 0.5f;
 
         [SerializeField] private CharacterMovementController _movementController;
@@ -13,10 +14,11 @@ namespace CharacterMovement
 
         private LegIKController _lastSteppedLeg;
         private float _previousCycle;
+        private System.Random _random = new System.Random();
 
         void Update()
         {
-            if(!IsMoving())
+            if (!IsMoving())
             {
                 _previousCycle = _movementController.LocomotionCycle;
                 return;
@@ -27,7 +29,7 @@ namespace CharacterMovement
             _previousCycle = _movementController.LocomotionCycle;
         }
 
-        private void HandleLegCycle() // TODO
+        private void HandleLegCycle()
         {
             float currentCycle = _movementController.LocomotionCycle;
 
@@ -45,10 +47,13 @@ namespace CharacterMovement
 
         private void TryStepLeg(float previousCycle, float currentCycle, LegIKController leg)
         {
-            if (HasEnteredSwing(previousCycle, currentCycle) && !leg.IsMoving)
+            if (HasEnteredSwing(previousCycle, currentCycle) && (!leg.IsMoving || IsFootTargetTooFar(leg)))
             {
                 float stepDuration = CalculateStepDuration();
                 Vector2 stepTarget = CalculateStepTarget(leg, stepDuration);
+
+                Debug.Log($"leg: {leg.gameObject}, previousCycle: {previousCycle}," +
+                    $" currentCycle:{currentCycle}, stepDuration {stepDuration}");
                 leg.StartStep(stepTarget, stepDuration);
             }
         }
@@ -76,18 +81,26 @@ namespace CharacterMovement
 
             Vector2 pelvisPos = leg.ThighPivotPosition;
             Vector2 target = pelvisPos + Vector2.right * direction * stepLength;
-            target.y = leg.CurrentFootPosition.y;
+            target.y = -4.5f;
 
             return target;
+        }
+
+        private bool IsFootTargetTooFar(LegIKController leg)
+        {
+            float legLength = leg.FullLegLenght;
+            Vector2 thighPivot = leg.ThighPivotPosition;
+            Vector2 targetStepPosition = leg.TargetFootPosition;
+
+            float distance = Vector2.Distance(thighPivot, targetStepPosition);
+
+            return distance >= legLength;
         }
 
         private float CalculateStepDuration()
         {
             float cycleSpeed = _movementController.CurrentAbsoluteSpeed
                       * _movementController.CycleFrequency;
-
-            if (cycleSpeed <= 0.0001f)
-                return 0.2f;
 
             float swingPhaseLength = 0.5f;
             return swingPhaseLength / cycleSpeed;
@@ -96,6 +109,17 @@ namespace CharacterMovement
         private bool IsMoving()
         {
             return _movementController.CurrentAbsoluteSpeed > kSpeedThreshold;
+        }
+
+        private LegIKController GetAppropriateLeg()
+        {
+            if (_lastSteppedLeg == null)
+            {
+                bool coinToss = _random.TossACoin();
+                return coinToss ? _rightLeg : _leftLeg;
+            }
+
+            return _lastSteppedLeg == _rightLeg ? _leftLeg : _rightLeg;
         }
     }
 }
