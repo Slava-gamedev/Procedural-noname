@@ -34,10 +34,10 @@ namespace CharacterMovement
             float currentCycle = _movementController.LocomotionCycle;
 
             float currentRightLegCycle = currentCycle;
-            float currentLeftLegCycle = (currentCycle + 0.5f) % 1f;
+            float currentLeftLegCycle = (currentCycle + kStanceEnd) % 1f;
 
             float previousRightLegCycle = _previousCycle;
-            float previousLeftLegCycle = (_previousCycle + 0.5f) % 1f;
+            float previousLeftLegCycle = (_previousCycle + kStanceEnd) % 1f;
 
 
             TryStepLeg(previousRightLegCycle, currentRightLegCycle, _rightLeg);
@@ -47,13 +47,13 @@ namespace CharacterMovement
 
         private void TryStepLeg(float previousCycle, float currentCycle, LegIKController leg)
         {
-            if (HasEnteredSwing(previousCycle, currentCycle) && (!leg.IsMoving || IsFootTargetTooFar(leg)))
+            bool hasEnteredSwing = HasEnteredSwing(previousCycle, currentCycle);
+            bool needReset = !leg.IsMoving || IsFootTargetTooFar(leg);
+
+            if (hasEnteredSwing && needReset)
             {
                 float stepDuration = CalculateStepDuration();
                 Vector2 stepTarget = CalculateStepTarget(leg, stepDuration);
-
-                Debug.Log($"leg: {leg.gameObject}, previousCycle: {previousCycle}," +
-                    $" currentCycle:{currentCycle}, stepDuration {stepDuration}");
                 leg.StartStep(stepTarget, stepDuration);
             }
         }
@@ -102,7 +102,7 @@ namespace CharacterMovement
             float cycleSpeed = _movementController.CurrentAbsoluteSpeed
                       * _movementController.CycleFrequency;
 
-            float swingPhaseLength = 0.5f;
+            float swingPhaseLength = 1 - kStanceEnd;
             return swingPhaseLength / cycleSpeed;
         }
 
@@ -110,6 +110,13 @@ namespace CharacterMovement
         {
             return _movementController.CurrentAbsoluteSpeed > kSpeedThreshold;
         }
+
+
+        private void RepositonLegsOnStop()
+        {
+
+        }
+
 
         private LegIKController GetAppropriateLeg()
         {

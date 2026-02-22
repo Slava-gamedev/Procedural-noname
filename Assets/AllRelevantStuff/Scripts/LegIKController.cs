@@ -24,6 +24,7 @@ namespace CharacterMovement
         public Vector2 CurrentFootPosition => _footTarget.position;
         public Vector2 ThighPivotPosition => _thighPivot.position;
         public Vector2 TargetFootPosition => _targetStepPosition;
+        private float _angleDirectionModifier;
 
         private void Awake()
         {
@@ -37,6 +38,8 @@ namespace CharacterMovement
             _currentStepDuration = stepDuration;
             _startStepPosition = CurrentFootPosition;
             _targetStepPosition = targetPositon;
+
+            _angleDirectionModifier = _startStepPosition.x < _targetStepPosition.x ? 1 : -1;
             _elapsedTime = 0f;
             IsMoving = true;
         }
@@ -80,14 +83,14 @@ namespace CharacterMovement
         {
             Vector2 vectorToTarget = CurrentFootPosition - (Vector2)_thighPivot.position;
             float distance = vectorToTarget.magnitude;
-            distance = Mathf.Min(distance, _thighLength + _shinLength);
+            distance = Mathf.Min(distance, FullLegLenght);
 
             float a = _thighLength;
             float b = _shinLength;
             float c = distance;
 
             float cosKnee = (a * a + b * b - c * c) / (2 * a * b);
-            cosKnee = Mathf.Clamp(cosKnee, -1f, 1f); 
+            cosKnee = Mathf.Clamp(cosKnee, -1f, 1f);
             float kneeAngle = Mathf.Acos(cosKnee) * Mathf.Rad2Deg;
 
             float angleToTarget = Mathf.Atan2(vectorToTarget.y, vectorToTarget.x) * Mathf.Rad2Deg;
@@ -95,10 +98,10 @@ namespace CharacterMovement
             cosThigh = Mathf.Clamp(cosThigh, -1f, 1f);
 
             float angleOffset = Mathf.Acos(cosThigh) * Mathf.Rad2Deg;
-            float thighAngle = angleToTarget - angleOffset + _boneForwardOffset;
+            float thighAngle = angleToTarget + (angleOffset * _angleDirectionModifier) + _boneForwardOffset;
 
             _thighPivot.localRotation = Quaternion.Euler(0, 0, thighAngle);
-            _shinPivot.localRotation = Quaternion.Euler(0, 0, 180 - kneeAngle);
+            _shinPivot.localRotation = Quaternion.Euler(0, 0, (180 - kneeAngle) * (_angleDirectionModifier * -1f));
             _vectorToTarget = GetCurrentDirectionToTarget();
         }
 

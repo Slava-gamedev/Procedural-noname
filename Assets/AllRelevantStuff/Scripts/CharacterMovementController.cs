@@ -9,6 +9,7 @@ namespace CharacterMovement
         [SerializeField] private float _deceleration;
         [SerializeField] private Rigidbody2D _rigidbody;
         [SerializeField] private float _cycleFrequency = 1f;
+        [SerializeField] private SpriteRenderer _bodySprite;
 
         private Vector2 _currentMovementDirection;
 
@@ -35,10 +36,12 @@ namespace CharacterMovement
             if (Input.GetKey(KeyCode.RightArrow))
             {
                 _currentMovementDirection = Vector2.right;
+                _bodySprite.flipX = true;
             }
             else if (Input.GetKey(KeyCode.LeftArrow))
             {
                 _currentMovementDirection = Vector2.left;
+                _bodySprite.flipX = false;
             }
             else
             {
