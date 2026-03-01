@@ -4,30 +4,41 @@ namespace CharacterMovement
 {
     public class BodyController : MonoBehaviour
     {
-        [SerializeField] private CharacterMovementController _movementController;
-        [SerializeField] private Transform _bodyTransform;
-        [SerializeField] private float _bodyAmplitude = 0.05f;
-        [SerializeField] private float _baseHeight = 0f;
+        [SerializeField] private Rigidbody2D _rigidbody;
+        [SerializeField] private float _standingHeight;
+        [SerializeField] private float _damping;
+        [SerializeField] private float _stiffness;
+        [SerializeField] private LayerMask _groundLayer;
+        [SerializeField] private float _raycastLength;
+        private float _bodyRadius;
 
-        void Update()
+        private void Start()
         {
-            ApplyVerticalOffset();
+            _bodyRadius = transform.localScale.x / 2;
         }
 
-        private void ApplyVerticalOffset()
+        private void FixedUpdate()
         {
-            float cycle = _movementController.LocomotionCycle;
-            float verticalOffset = CalculateVerticalOffset(cycle);
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, _bodyRadius, Vector2.down, _raycastLength, _groundLayer);
 
-            Vector3 localPosition = _bodyTransform.localPosition;
-            localPosition.y = _baseHeight + verticalOffset;
+            if (hit.collider == null)
+            {
+                return;
+            }
 
-            _bodyTransform.localPosition = localPosition;
+            if(hit.distance <= _standingHeight)
+            {
+                ApplyForceToRigidbody(hit.distance, _standingHeight);
+            }
         }
 
-        private float CalculateVerticalOffset(float cycle)
+        private void ApplyForceToRigidbody(float currentDistance, float targetDistance)
         {
-            return -Mathf.Cos(cycle * Mathf.PI * 2f) * _bodyAmplitude;
+            float verticalVelocity = _rigidbody.linearVelocityY;
+            float force = (targetDistance - currentDistance) * _stiffness - (verticalVelocity * _damping);
+            force = force * _rigidbody.mass;
+
+            _rigidbody.AddForceY(force, ForceMode2D.Force);
         }
     }
 }
