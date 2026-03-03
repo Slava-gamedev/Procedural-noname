@@ -5,7 +5,7 @@ namespace CharacterMovement
     public class GroundDetector : MonoBehaviour
     {
         [SerializeField] private LayerMask _groundLayer;
-        private float _maxRaycastDistance = 6f;
+        private float _maxRaycastDistance = 30f;
         private float _upwardOffset = 3f;
 
         public float GetGroundHeightAtPosition(Vector2 worldPosition)

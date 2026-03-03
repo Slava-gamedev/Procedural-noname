@@ -1756,7 +1756,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerCharacter: {fileID: 245601050}
-  _followSpeed: 3
+  _followSpeed: 4
 --- !u!114 &1645069096
 MonoBehaviour:
   m_ObjectHideFlags: 0
