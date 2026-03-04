@@ -18,6 +18,7 @@ namespace CharacterMovement
         {
             if (!IsMoving())
             {
+                RepositionLegs();
                 CacheCurrentCycle();
                 return;
             }
@@ -45,6 +46,7 @@ namespace CharacterMovement
 
             float stepDuration = CalculateStepDuration();
             Vector2 stepTarget = CalculateStepTarget(leg, stepDuration);
+            leg.UpdateFacingDirection(_movementController.FacingDirection);
             leg.StartStep(stepTarget, stepDuration);
         }
 
@@ -93,8 +95,12 @@ namespace CharacterMovement
 
         private float CalculateStepDuration()
         {
-            float cycleSpeed = _movementController.CurrentAbsoluteSpeed
-                      * _movementController.CycleFrequency;
+            float currentSpeed = _movementController.CurrentAbsoluteSpeed;
+            float cycleFrequency = _movementController.CycleFrequency;
+            float cycleSpeed = currentSpeed * cycleFrequency;
+            float deceleration = _movementController.Deceleration;
+
+            cycleSpeed = cycleSpeed < 0.01f ? deceleration * cycleFrequency : currentSpeed * cycleFrequency;
 
             float swingPhaseLength = 1 - kStanceCycleEnd;
             return swingPhaseLength / cycleSpeed;
@@ -108,6 +114,25 @@ namespace CharacterMovement
         private void CacheCurrentCycle()
         {
             _previousCycle = _movementController.LocomotionCycle;
+        }
+
+        private void TryStepIgnoringCycle(LegIKController leg, LegIKController opposingLeg)
+        {
+            if (opposingLeg.IsMoving || !IsFootTargetTooFar(leg))
+            {
+                return;
+            }
+
+            float stepDuration = CalculateStepDuration();
+            Vector2 stepTarget = CalculateStepTarget(leg, stepDuration);
+            leg.UpdateFacingDirection(_movementController.FacingDirection);
+            leg.StartStep(stepTarget, stepDuration);
+        }
+
+        private void RepositionLegs()
+        {
+            TryStepIgnoringCycle(_rightLeg, _leftLeg);
+            TryStepIgnoringCycle(_leftLeg, _rightLeg);
         }
     }
 }

@@ -33,13 +33,17 @@ namespace CharacterMovement
             _cachedDirectionToTarget = GetCurrentDirectionToTarget();
         }
 
+        public void UpdateFacingDirection(FacingDirection facingDirection)
+        {
+            _angleDirectionModifier = facingDirection == FacingDirection.Right ? 1 : -1;
+        }
+
         public void StartStep(Vector2 targetPositon, float stepDuration)
         {
             _currentStepDuration = stepDuration;
             _startStepPosition = CurrentFootPosition;
             _targetStepPosition = targetPositon;
 
-            _angleDirectionModifier = _startStepPosition.x < _targetStepPosition.x ? 1 : -1;
             _elapsedTime = 0f;
             IsMoving = true;
         }
@@ -49,7 +53,6 @@ namespace CharacterMovement
             if (IsMoving)
             {
                 StepUpdate();
-                return;
             }
             else if (!IsLegAlignedWithTarget())
             {

@@ -2,6 +2,13 @@ using UnityEngine;
 
 namespace CharacterMovement
 {
+
+    public enum FacingDirection
+    {
+        Left = 0,
+        Right = 1,
+    }
+
     public class CharacterMovementController : MonoBehaviour
     {
         private const float kSpeedThreshold = 0.2f;
@@ -13,13 +20,17 @@ namespace CharacterMovement
         [SerializeField] private float _cycleFrequency = 1f;
         [SerializeField] private SpriteRenderer _bodySprite;
         private Vector2 _movementDirection;
+        private FacingDirection _facingDirection;
 
+        public FacingDirection FacingDirection => _facingDirection;
         public float LocomotionCycle {  get; private set; }
-        public Vector2 MovementDirection => _movementDirection;
         public float MaxSpeed => _maxMovementSpeed;
         public float CurrentAbsoluteSpeed { get; private set; }
         public float CurrentSignedSpeed { get; private set; }
         public float CycleFrequency => _cycleFrequency;
+        public float Deceleration => _deceleration;
+
+
 
         void Update()
         {
@@ -89,6 +100,7 @@ namespace CharacterMovement
                 return;
             }
 
+            _facingDirection = horizontalInput > 0 ? FacingDirection.Right : FacingDirection.Left;
             _bodySprite.flipX = horizontalInput > 0;
         }
     }
