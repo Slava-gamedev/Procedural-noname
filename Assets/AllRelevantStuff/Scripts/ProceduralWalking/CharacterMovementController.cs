@@ -28,7 +28,6 @@ namespace CharacterMovement
         public float CurrentAbsoluteSpeed { get; private set; }
         public float CurrentSignedSpeed { get; private set; }
         public float CycleFrequency => _cycleFrequency;
-        public float Deceleration => _deceleration;
 
 
 

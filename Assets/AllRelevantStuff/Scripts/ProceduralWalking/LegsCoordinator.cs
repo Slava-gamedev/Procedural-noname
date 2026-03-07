@@ -12,6 +12,8 @@ namespace CharacterMovement
         [SerializeField] private LegIKController _leftLeg;
         [SerializeField] private GroundDetector _groundDetector;
 
+        [SerializeField] private float _minStepDuration;
+        [SerializeField] private float _maxStepDuration;
         private float _previousCycle;
 
         void Update()
@@ -95,15 +97,21 @@ namespace CharacterMovement
 
         private float CalculateStepDuration()
         {
+            float minEffectiveSpeed = 0.5f;
             float currentSpeed = _movementController.CurrentAbsoluteSpeed;
+            currentSpeed = Mathf.Max(currentSpeed, minEffectiveSpeed);
+
             float cycleFrequency = _movementController.CycleFrequency;
             float cycleSpeed = currentSpeed * cycleFrequency;
-            float deceleration = _movementController.Deceleration;
 
-            cycleSpeed = cycleSpeed < 0.01f ? deceleration * cycleFrequency : currentSpeed * cycleFrequency;
+            cycleSpeed = currentSpeed * cycleFrequency;
 
             float swingPhaseLength = 1 - kStanceCycleEnd;
-            return swingPhaseLength / cycleSpeed;
+            float stepDuration = swingPhaseLength / cycleSpeed;
+
+            stepDuration = Mathf.Clamp(stepDuration, _minStepDuration, _maxStepDuration);
+
+            return stepDuration;
         }
 
         private bool IsMoving()
