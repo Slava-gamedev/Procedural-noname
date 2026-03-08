@@ -14,7 +14,6 @@ namespace CharacterMovement
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
 
-
         private float _fullLegLength;
         private float _bodyRadius;
 
@@ -53,7 +52,8 @@ namespace CharacterMovement
 
         private float CalculateVerticalOffset()
         {
-            float currentStepWidth = Mathf.Abs(_rightLeg.CurrentFootPosition.x - _leftLeg.CurrentFootPosition.x); 
+            //float currentStepWidth = Mathf.Abs(_rightLeg.CurrentFootPosition.x - _leftLeg.CurrentFootPosition.x); 
+            float currentStepWidth = Vector2.Distance(_rightLeg.CurrentFootPosition, _leftLeg.CurrentFootPosition); 
             float halfWidth = currentStepWidth / 2;
 
             halfWidth = Mathf.Clamp(halfWidth, 0, _fullLegLength);
