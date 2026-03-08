@@ -32,13 +32,15 @@ namespace CharacterMovement
                 return;
             }
 
-            if(hit.distance <= _standingHeight)
+            if(hit.distance > _standingHeight)
             {
-                float verticalOffset = CalculateVerticalOffset();
-                float finalStandingHeight = _standingHeight + verticalOffset;
-
-                ApplyForceToRigidbody(hit.distance, finalStandingHeight);
+                return;
             }
+
+            float verticalOffset = CalculateVerticalOffset();
+            float finalStandingHeight = _standingHeight + verticalOffset;
+
+            ApplyForceToRigidbody(hit.distance, finalStandingHeight);
         }
 
         private void ApplyForceToRigidbody(float currentDistance, float targetDistance)
@@ -52,7 +54,6 @@ namespace CharacterMovement
 
         private float CalculateVerticalOffset()
         {
-            //float currentStepWidth = Mathf.Abs(_rightLeg.CurrentFootPosition.x - _leftLeg.CurrentFootPosition.x); 
             float currentStepWidth = Vector2.Distance(_rightLeg.CurrentFootPosition, _leftLeg.CurrentFootPosition); 
             float halfWidth = currentStepWidth / 2;
 
