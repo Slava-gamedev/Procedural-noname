@@ -56,6 +56,7 @@ namespace CharacterMovement
             float currentStepWidth = Mathf.Abs(_rightLeg.CurrentFootPosition.x - _leftLeg.CurrentFootPosition.x); 
             float halfWidth = currentStepWidth / 2;
 
+            halfWidth = Mathf.Clamp(halfWidth, 0, _fullLegLength);
             float currentHeight = Mathf.Sqrt(_fullLegLength * _fullLegLength - (halfWidth * halfWidth));
             float verticalOffset = currentHeight - _fullLegLength;
 
