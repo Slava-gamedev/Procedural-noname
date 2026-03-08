@@ -695,6 +695,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   _raycastLength: 4
+  _rightLeg: {fileID: 1613814893}
+  _leftLeg: {fileID: 2675618}
 --- !u!50 &245601057
 Rigidbody2D:
   serializedVersion: 5

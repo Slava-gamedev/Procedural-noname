@@ -16,7 +16,7 @@ namespace CharacterMovement
         [SerializeField] private float _maxStepDuration;
         private float _previousCycle;
 
-        void Update()
+        private void Update()
         {
             if (!IsMoving())
             {
