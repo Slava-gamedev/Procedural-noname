@@ -21,5 +21,12 @@ namespace CharacterMovement
             return worldPosition.y;
         }
 
+        public RaycastHit2D ProjectBodyOnTheGround(Vector2 origin, float bodyRadius)
+        {
+            RaycastHit2D hit = Physics2D.CircleCast(transform.position, bodyRadius, Vector2.down, _maxRaycastDistance, _groundLayer);
+
+            return hit;
+        }
+
     }
 }

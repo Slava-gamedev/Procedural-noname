@@ -8,11 +8,10 @@ namespace CharacterMovement
         [SerializeField] private float _standingHeight;
         [SerializeField] private float _damping;
         [SerializeField] private float _stiffness;
-        [SerializeField] private LayerMask _groundLayer;
-        [SerializeField] private float _raycastLength;
 
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
+        [SerializeField] private GroundDetector _groundDetector;
 
         private float _fullLegLength;
         private float _bodyRadius;
@@ -25,8 +24,8 @@ namespace CharacterMovement
 
         private void FixedUpdate()
         {
-            RaycastHit2D hit = Physics2D.CircleCast(transform.position, _bodyRadius, Vector2.down, _raycastLength, _groundLayer);
-
+            RaycastHit2D hit = _groundDetector.ProjectBodyOnTheGround(transform.position, _bodyRadius);
+            
             if (hit.collider == null)
             {
                 return;

@@ -24,7 +24,6 @@ namespace CharacterMovement
 
         public FacingDirection FacingDirection => _facingDirection;
         public float LocomotionCycle {  get; private set; }
-        public float MaxSpeed => _maxMovementSpeed;
         public float CurrentAbsoluteSpeed { get; private set; }
         public float CurrentSignedSpeed { get; private set; }
         public float CycleFrequency => _cycleFrequency;
