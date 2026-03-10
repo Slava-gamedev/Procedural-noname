@@ -694,6 +694,8 @@ MonoBehaviour:
   _rightLeg: {fileID: 1613814893}
   _leftLeg: {fileID: 2675618}
   _groundDetector: {fileID: 245601055}
+  _movementController: {fileID: 245601051}
+  _minObstacleThreshold: 0.2
 --- !u!50 &245601057
 Rigidbody2D:
   serializedVersion: 5
