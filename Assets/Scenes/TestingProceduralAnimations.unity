@@ -691,12 +691,9 @@ MonoBehaviour:
   _standingHeight: 1.3
   _damping: 5
   _stiffness: 60
-  _groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
-  _raycastLength: 4
   _rightLeg: {fileID: 1613814893}
   _leftLeg: {fileID: 2675618}
+  _groundDetector: {fileID: 245601055}
 --- !u!50 &245601057
 Rigidbody2D:
   serializedVersion: 5
