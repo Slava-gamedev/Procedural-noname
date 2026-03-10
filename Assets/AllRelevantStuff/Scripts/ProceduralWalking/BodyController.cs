@@ -59,9 +59,9 @@ namespace CharacterMovement
                 float currentX = transform.position.x;
 
                 float interpolationParameter = Mathf.InverseLerp(startX, endX, currentX);
-                float ascendParameter = Mathf.InverseLerp(0.5f, 1f, interpolationParameter);
+                //float ascendParameter = Mathf.InverseLerp(0.5f, 1f, interpolationParameter);
 
-                finalPerceivedDistance = Mathf.Lerp(_cachedHitDistance, hit.distance, ascendParameter);
+                finalPerceivedDistance = Mathf.Lerp(_cachedHitDistance, hit.distance, interpolationParameter);
             }
             else
             {
@@ -98,8 +98,10 @@ namespace CharacterMovement
 
         private void OnDrawGizmos()
         {
+            RaycastHit2D hit = _groundDetector.ProjectBodyOnTheGround(transform.position, _bodyRadius);
             Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(_cachedHitPoint, _bodyRadius);
+            Vector3 end = hit.point + (hit.normal * _maxObstacleThreshold);
+            Gizmos.DrawLine(hit.point, end);
         }
     }
 }
