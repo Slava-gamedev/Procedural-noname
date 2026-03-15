@@ -674,14 +674,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _rigidbody: {fileID: 245601057}
   _standingHeight: 1.3
-  _damping: 6
+  _damping: 10
   _stiffness: 60
   _rightLeg: {fileID: 1613814893}
   _leftLeg: {fileID: 2675618}
   _groundDetector: {fileID: 245601059}
   _movementController: {fileID: 245601051}
-  _minObstacleThreshold: 0.2
-  _maxObstacleThreshold: 0.9
+  _minObstacleThreshold: 0.1
+  _maxObstacleThreshold: 0.91
 --- !u!50 &245601057
 Rigidbody2D:
   serializedVersion: 5

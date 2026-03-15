@@ -53,7 +53,6 @@ namespace CharacterMovement
             {
                 _cachedHitPoint = _cachedHitPoint == Vector2.zero ? hit.point : _cachedHitPoint;
                 float interpolationParameter = 0;
-                Debug.Log($"hit.point: {hit.point}, _cachedHitPoint: {_cachedHitPoint}, heightDifference: {heightDifference}");
                 if (OneLegOnNewHeight(_cachedHitPoint))
                 {
                     bool isFacingRight = _movementController.FacingDirection == FacingDirection.Right;
