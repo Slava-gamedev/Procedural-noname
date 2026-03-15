@@ -11,64 +11,54 @@ namespace CharacterMovement
 
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
-        [SerializeField] private TerrainAnalyzer _groundDetector;
+        [SerializeField] private TerrainAnalyzer _terrainAnalyzer;
         [SerializeField] private CharacterMovementController _movementController;
-
-        [SerializeField] private float _minObstacleThreshold = 0.2f;
-        [SerializeField] private float _maxObstacleThreshold = 1f;
 
         private float _fullLegLength;
         private float _bodyRadius;
-        private float _cachedHitDistance;
-        private Vector2 _cachedHitPoint;
-
+        private TerrainReport? _cachedReport;
 
         private void Start()
         {
             _fullLegLength = _rightLeg.FullLegLength;
             _bodyRadius = transform.localScale.x / 2;
-
-            RaycastHit2D hit = _groundDetector.ProjectBodyOnTheGround(transform.position, _bodyRadius);
-            _cachedHitDistance = hit.distance;
         }
 
         private void FixedUpdate()
         {
-            RaycastHit2D hit = _groundDetector.ProjectBodyOnTheGround(transform.position, _bodyRadius);
+            TerrainReport report = _terrainAnalyzer.CheckTerrain(transform.position,
+                _bodyRadius, _movementController.FacingDirection);
 
-            if (hit.collider == null)
+            if(report.BodyDistance > _standingHeight)
             {
                 return;
             }
 
-            if (hit.distance > _standingHeight)
-            {
-                return;
-            }
+            float finalPerceivedDistance = report.FrontDistance;
 
-            float finalPerceivedDistance = hit.distance;
-            float heightDifference = Mathf.Abs(hit.distance - _cachedHitDistance);
-
-            if (heightDifference >= _minObstacleThreshold && heightDifference <= _maxObstacleThreshold)
+            if (report.ShouldDescend || report.ShouldAscend)
             {
-                _cachedHitPoint = _cachedHitPoint == Vector2.zero ? hit.point : _cachedHitPoint;
+                _cachedReport = _cachedReport == null ? report : _cachedReport;
+                TerrainReport reportValue = _cachedReport.Value;
+
+                Vector2 hitPoint = reportValue.FrontHitPoint;
                 float interpolationParameter = 0;
-                if (OneLegOnNewHeight(_cachedHitPoint))
-                {
-                    bool isFacingRight = _movementController.FacingDirection == FacingDirection.Right;
-                    float startX = isFacingRight ? _cachedHitPoint.x - _bodyRadius : _cachedHitPoint.x + _bodyRadius;
-                    float endX = isFacingRight ? _cachedHitPoint.x + _bodyRadius : _cachedHitPoint.x - _bodyRadius;
-                    float currentX = transform.position.x;
+                float currentX = transform.position.x;
 
-                    interpolationParameter = Mathf.InverseLerp(startX, endX, currentX);
+                if (OneLegOnNewHeight(hitPoint.y) && reportValue.ShouldAscend)
+                {
+                    interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
+                }
+                else if (report.ShouldDescend)
+                {
+                    interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
                 }
 
-                finalPerceivedDistance = Mathf.Lerp(_cachedHitDistance, hit.distance, interpolationParameter);
+                finalPerceivedDistance = Mathf.Lerp(reportValue.BodyDistance, reportValue.FrontDistance, interpolationParameter);
             }
             else
             {
-                _cachedHitDistance = hit.distance;
-                _cachedHitPoint = Vector2.zero;
+                _cachedReport = null;
             }
 
             float verticalOffset = CalculateVerticalOffset();
@@ -77,15 +67,15 @@ namespace CharacterMovement
             ApplyForceToRigidbody(finalPerceivedDistance, finalStandingHeight);
         }
 
-        private bool OneLegOnNewHeight(Vector2 hitPoint)
+        private bool OneLegOnNewHeight(float newHeight)
         {
             float yDifferenceThreshold = 0.05f;
 
             Vector2 leftLegFoot = _leftLeg.TargetFootPosition;
             Vector2 rightLegFoot = _rightLeg.TargetFootPosition;
 
-            float yDifferenceForLeftLeg = Mathf.Abs(hitPoint.y - leftLegFoot.y);
-            float yDifferenceForRightLeg = Mathf.Abs(hitPoint.y - rightLegFoot.y);
+            float yDifferenceForLeftLeg = Mathf.Abs(newHeight - leftLegFoot.y);
+            float yDifferenceForRightLeg = Mathf.Abs(newHeight - rightLegFoot.y);
 
             if(yDifferenceForLeftLeg < yDifferenceThreshold && !_leftLeg.IsMoving
                 || yDifferenceForRightLeg < yDifferenceThreshold && !_rightLeg.IsMoving)
@@ -119,15 +109,22 @@ namespace CharacterMovement
 
         private void OnDrawGizmos()
         {
-            RaycastHit2D hit = _groundDetector.ProjectBodyOnTheGround(transform.position, _bodyRadius);
-            Gizmos.color = Color.yellow;
-            Vector3 end = hit.point + (hit.normal * _maxObstacleThreshold);
+            if(_cachedReport != null)
+            {
+                TerrainReport reportValue = _cachedReport.Value;
 
-            Vector3 distanceEnd = hit.point + (hit.normal * hit.distance);
+                Gizmos.color = Color.red;
+                Vector2 start = new Vector2(reportValue.StartInterpolationX, transform.position.y);
+                Vector2 end = new Vector2(reportValue.EndInterpolationX, transform.position.y);
 
-            Gizmos.DrawLine(hit.point, end);
-            Gizmos.color = Color.red;
-            Gizmos.DrawLine(hit.point, distanceEnd);
+                Gizmos.DrawLine(start, start + Vector2.down);
+                Gizmos.DrawLine(end, end + Vector2.down);
+
+                Gizmos.color = Color.green;
+                Vector2 middle = transform.position;
+                Gizmos.DrawLine(middle, middle + Vector2.down);
+
+            }
         }
     }
 }

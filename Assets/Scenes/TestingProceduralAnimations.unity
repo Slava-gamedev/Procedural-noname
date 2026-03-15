@@ -678,7 +678,7 @@ MonoBehaviour:
   _stiffness: 60
   _rightLeg: {fileID: 1613814893}
   _leftLeg: {fileID: 2675618}
-  _groundDetector: {fileID: 245601059}
+  _terrainAnalyzer: {fileID: 245601059}
   _movementController: {fileID: 245601051}
   _minObstacleThreshold: 0.1
   _maxObstacleThreshold: 0.91
@@ -761,6 +761,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   _footWidth: 0.32
+  _minObstacleThreshold: 0.1
+  _maxObstacleThreshold: 0.91
 --- !u!1 &425177013
 GameObject:
   m_ObjectHideFlags: 0
