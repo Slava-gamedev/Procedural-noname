@@ -10,7 +10,7 @@ namespace CharacterMovement
         [SerializeField] private CharacterMovementController _movementController;
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
-        [SerializeField] private GroundDetector _groundDetector;
+        [SerializeField] private TerrainAnalyzer _groundDetector;
 
         [SerializeField] private float _minStepDuration;
         [SerializeField] private float _maxStepDuration;

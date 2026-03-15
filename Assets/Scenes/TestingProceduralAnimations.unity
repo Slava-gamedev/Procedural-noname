@@ -595,10 +595,10 @@ GameObject:
   - component: {fileID: 245601050}
   - component: {fileID: 245601051}
   - component: {fileID: 245601052}
-  - component: {fileID: 245601055}
   - component: {fileID: 245601056}
   - component: {fileID: 245601058}
   - component: {fileID: 245601057}
+  - component: {fileID: 245601059}
   m_Layer: 0
   m_Name: Character_Root
   m_TagString: Untagged
@@ -657,24 +657,9 @@ MonoBehaviour:
   _movementController: {fileID: 245601051}
   _rightLeg: {fileID: 1613814893}
   _leftLeg: {fileID: 2675618}
-  _groundDetector: {fileID: 245601055}
+  _groundDetector: {fileID: 245601059}
   _minStepDuration: 0.1
   _maxStepDuration: 0.6
---- !u!114 &245601055
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 245601049}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8aa934fe0e12604fbf0d60d19b3b92b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _groundLayer:
-    serializedVersion: 2
-    m_Bits: 8
 --- !u!114 &245601056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -693,10 +678,10 @@ MonoBehaviour:
   _stiffness: 60
   _rightLeg: {fileID: 1613814893}
   _leftLeg: {fileID: 2675618}
-  _groundDetector: {fileID: 245601055}
+  _groundDetector: {fileID: 245601059}
   _movementController: {fileID: 245601051}
   _minObstacleThreshold: 0.2
-  _maxObstacleThreshold: 1.1
+  _maxObstacleThreshold: 0.9
 --- !u!50 &245601057
 Rigidbody2D:
   serializedVersion: 5
@@ -760,6 +745,22 @@ CircleCollider2D:
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_Radius: 0.5
+--- !u!114 &245601059
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245601049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a3261bf9a886d2d4c94c767021586afa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _groundLayer:
+    serializedVersion: 2
+    m_Bits: 8
+  _footWidth: 0.32
 --- !u!1 &425177013
 GameObject:
   m_ObjectHideFlags: 0
@@ -1050,8 +1051,8 @@ Transform:
   m_GameObject: {fileID: 769863398}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 30.52, y: -4.0502, z: 0}
-  m_LocalScale: {x: 3.2212, y: 0.89946216, z: 1}
+  m_LocalPosition: {x: 30.52, y: -4.05, z: 0}
+  m_LocalScale: {x: 3.2212, y: 0.9, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1009311782}
@@ -2163,8 +2164,8 @@ Transform:
   m_GameObject: {fileID: 1673372067}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 42.36, y: -3.9996, z: 0}
-  m_LocalScale: {x: 2.3490329, y: 1.0005885, z: 1}
+  m_LocalPosition: {x: 42.36, y: -4, z: 0}
+  m_LocalScale: {x: 2.3490329, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1009311782}
@@ -2325,8 +2326,8 @@ Transform:
   m_GameObject: {fileID: 1745306997}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 69.11, y: -3.2689, z: 0}
-  m_LocalScale: {x: 2, y: 2.4621449, z: 1}
+  m_LocalPosition: {x: 69.11, y: -3.25, z: 0}
+  m_LocalScale: {x: 2, y: 2.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1009311782}
@@ -2518,8 +2519,8 @@ Transform:
   m_GameObject: {fileID: 1882828988}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 55.46, y: -3.8907, z: 0}
-  m_LocalScale: {x: 2, y: 1.21863, z: 1}
+  m_LocalPosition: {x: 55.46, y: -3.9, z: 0}
+  m_LocalScale: {x: 2, y: 1.2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1009311782}
@@ -2680,8 +2681,8 @@ Transform:
   m_GameObject: {fileID: 1997780450}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 8.92, y: -4.3053, z: 0}
-  m_LocalScale: {x: 4, y: 0.38948, z: 1}
+  m_LocalPosition: {x: 8.92, y: -4.3, z: 0}
+  m_LocalScale: {x: 4, y: 0.4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 1009311782}

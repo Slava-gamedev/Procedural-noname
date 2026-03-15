@@ -11,7 +11,7 @@ namespace CharacterMovement
 
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
-        [SerializeField] private GroundDetector _groundDetector;
+        [SerializeField] private TerrainAnalyzer _groundDetector;
         [SerializeField] private CharacterMovementController _movementController;
 
         [SerializeField] private float _minObstacleThreshold = 0.2f;
@@ -52,14 +52,17 @@ namespace CharacterMovement
             if (heightDifference >= _minObstacleThreshold && heightDifference <= _maxObstacleThreshold)
             {
                 _cachedHitPoint = _cachedHitPoint == Vector2.zero ? hit.point : _cachedHitPoint;
+                float interpolationParameter = 0;
+                Debug.Log($"hit.point: {hit.point}, _cachedHitPoint: {_cachedHitPoint}, heightDifference: {heightDifference}");
+                if (OneLegOnNewHeight(_cachedHitPoint))
+                {
+                    bool isFacingRight = _movementController.FacingDirection == FacingDirection.Right;
+                    float startX = isFacingRight ? _cachedHitPoint.x - _bodyRadius : _cachedHitPoint.x + _bodyRadius;
+                    float endX = isFacingRight ? _cachedHitPoint.x + _bodyRadius : _cachedHitPoint.x - _bodyRadius;
+                    float currentX = transform.position.x;
 
-                bool isFacingRight = _movementController.FacingDirection == FacingDirection.Right;
-                float startX = isFacingRight ? _cachedHitPoint.x - _bodyRadius : _cachedHitPoint.x + _bodyRadius; 
-                float endX = isFacingRight ? _cachedHitPoint.x + _bodyRadius : _cachedHitPoint.x - _bodyRadius; 
-                float currentX = transform.position.x;
-
-                float interpolationParameter = Mathf.InverseLerp(startX, endX, currentX);
-                //float ascendParameter = Mathf.InverseLerp(0.5f, 1f, interpolationParameter);
+                    interpolationParameter = Mathf.InverseLerp(startX, endX, currentX);
+                }
 
                 finalPerceivedDistance = Mathf.Lerp(_cachedHitDistance, hit.distance, interpolationParameter);
             }
@@ -73,6 +76,25 @@ namespace CharacterMovement
             float finalStandingHeight = _standingHeight + verticalOffset;
 
             ApplyForceToRigidbody(finalPerceivedDistance, finalStandingHeight);
+        }
+
+        private bool OneLegOnNewHeight(Vector2 hitPoint)
+        {
+            float yDifferenceThreshold = 0.05f;
+
+            Vector2 leftLegFoot = _leftLeg.TargetFootPosition;
+            Vector2 rightLegFoot = _rightLeg.TargetFootPosition;
+
+            float yDifferenceForLeftLeg = Mathf.Abs(hitPoint.y - leftLegFoot.y);
+            float yDifferenceForRightLeg = Mathf.Abs(hitPoint.y - rightLegFoot.y);
+
+            if(yDifferenceForLeftLeg < yDifferenceThreshold && !_leftLeg.IsMoving
+                || yDifferenceForRightLeg < yDifferenceThreshold && !_rightLeg.IsMoving)
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private void ApplyForceToRigidbody(float currentDistance, float targetDistance)
@@ -101,7 +123,12 @@ namespace CharacterMovement
             RaycastHit2D hit = _groundDetector.ProjectBodyOnTheGround(transform.position, _bodyRadius);
             Gizmos.color = Color.yellow;
             Vector3 end = hit.point + (hit.normal * _maxObstacleThreshold);
+
+            Vector3 distanceEnd = hit.point + (hit.normal * hit.distance);
+
             Gizmos.DrawLine(hit.point, end);
+            Gizmos.color = Color.red;
+            Gizmos.DrawLine(hit.point, distanceEnd);
         }
     }
 }
