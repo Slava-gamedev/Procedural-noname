@@ -17,6 +17,7 @@ namespace CharacterMovement
         private float _fullLegLength;
         private float _bodyRadius;
         private TerrainReport? _cachedReport;
+        private bool _startedAscending;
 
         private void Start()
         {
@@ -34,37 +35,89 @@ namespace CharacterMovement
                 return;
             }
 
-            float finalPerceivedDistance = report.FrontDistance;
+            float currentDistanceToGround = report.BodyDistance;
 
-            if (report.ShouldDescend || report.ShouldAscend)
+            float heightOffsetFromTerrain = CalculateVerticalOffsetFromTerrain(report);
+
+            float verticalOffsetFromSteoLength = CalculateVerticalOffsetFromStepLength();
+            float finalStandingHeight = _standingHeight + verticalOffsetFromSteoLength + heightOffsetFromTerrain;
+
+            ApplyForceToRigidbody(currentDistanceToGround, finalStandingHeight);
+        }
+
+        private float CalculateVerticalOffsetFromTerrain(TerrainReport terrainReport)
+        {
+            if (terrainReport.ShouldAscend)
             {
-                _cachedReport = _cachedReport == null ? report : _cachedReport;
-                TerrainReport reportValue = _cachedReport.Value;
-
-                Vector2 hitPoint = reportValue.FrontHitPoint;
-                float interpolationParameter = 0;
-                float currentX = transform.position.x;
-
-                if (OneLegOnNewHeight(hitPoint.y) && reportValue.ShouldAscend)
-                {
-                    interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
-                }
-                else if (report.ShouldDescend)
-                {
-                    interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
-                }
-
-                finalPerceivedDistance = Mathf.Lerp(reportValue.BodyDistance, reportValue.FrontDistance, interpolationParameter);
+                CacheReport(terrainReport);
+                return GetOffsetFromAscending();
+            }
+            else if (terrainReport.ShouldDescend)
+            {
+                CacheReport(terrainReport);
+                return GetOffsetFromDescending();
             }
             else
             {
-                _cachedReport = null;
+                ClearCachedReport();
+                return 0;
+            }
+        }
+
+        private float GetOffsetFromAscending()
+        {
+            float resultingOffset = 0;
+
+            TerrainReport reportValue = _cachedReport.Value;
+
+            Vector2 hitPoint = reportValue.FrontHitPoint;
+            float currentX = transform.position.x;
+
+            float heightDelta = reportValue.FrontDistance - reportValue.BodyDistance;
+
+            if (!OneLegOnNewHeight(hitPoint.y))
+            {
+                return resultingOffset;
             }
 
-            float verticalOffset = CalculateVerticalOffset();
-            float finalStandingHeight = _standingHeight + verticalOffset;
+            if (!_startedAscending)
+            {
+                reportValue.StartInterpolationX = currentX;
+                _cachedReport = reportValue;
+                _startedAscending = true;
+            }
 
-            ApplyForceToRigidbody(finalPerceivedDistance, finalStandingHeight);
+            float interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
+            resultingOffset = Mathf.Lerp(0, heightDelta, interpolationParameter);
+            return resultingOffset;
+        }
+
+        private float GetOffsetFromDescending()
+        {
+            float resultingOffset = 0;
+            TerrainReport reportValue = _cachedReport.Value;
+            float heightDelta = reportValue.FrontDistance - reportValue.BodyDistance;
+            float currentX = transform.position.x;
+
+            float interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
+            resultingOffset = Mathf.Lerp(0, heightDelta, interpolationParameter);
+
+            return resultingOffset;
+        }
+
+        private void CacheReport(TerrainReport terrainReport)
+        {
+            if (_cachedReport == null)
+            {
+                _cachedReport = terrainReport;
+                _startedAscending = false;
+            }
+        }
+
+        private void ClearCachedReport()
+        {
+            _startedAscending = false;
+            _cachedReport = null;
         }
 
         private bool OneLegOnNewHeight(float newHeight)
@@ -86,16 +139,17 @@ namespace CharacterMovement
             return false;
         }
 
-        private void ApplyForceToRigidbody(float currentDistance, float targetDistance)
+        private void ApplyForceToRigidbody(float currentDistanceToGround, float targetStandingHeight)
         {
             float verticalVelocity = _rigidbody.linearVelocityY;
-            float force = (targetDistance - currentDistance) * _stiffness - (verticalVelocity * _damping);
+            float force = (targetStandingHeight - currentDistanceToGround) * _stiffness - (verticalVelocity * _damping);
+
             force = force * _rigidbody.mass;
 
             _rigidbody.AddForceY(force, ForceMode2D.Force);
         }
 
-        private float CalculateVerticalOffset()
+        private float CalculateVerticalOffsetFromStepLength()
         {
             float currentStepWidth = Vector2.Distance(_rightLeg.CurrentFootPosition, _leftLeg.CurrentFootPosition);
             float halfWidth = currentStepWidth / 2;
@@ -109,7 +163,7 @@ namespace CharacterMovement
 
         private void OnDrawGizmos()
         {
-            if(_cachedReport != null)
+            if (_cachedReport != null)
             {
                 TerrainReport reportValue = _cachedReport.Value;
 
@@ -118,6 +172,7 @@ namespace CharacterMovement
                 Vector2 end = new Vector2(reportValue.EndInterpolationX, transform.position.y);
 
                 Gizmos.DrawLine(start, start + Vector2.down);
+                Gizmos.color = Color.yellow;
                 Gizmos.DrawLine(end, end + Vector2.down);
 
                 Gizmos.color = Color.green;
