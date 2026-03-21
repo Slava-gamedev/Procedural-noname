@@ -25,13 +25,6 @@ namespace CharacterMovement
             return worldPosition.y;
         }
 
-        public RaycastHit2D ProjectBodyOnTheGround(Vector2 origin, float bodyRadius)
-        {
-            RaycastHit2D hit = Physics2D.CircleCast(transform.position, bodyRadius, Vector2.down, _maxRaycastDistance, _groundLayer);
-
-            return hit;
-        }
-
         public TerrainReport CheckTerrain(Vector2 origin, float bodyRadius, FacingDirection facingDirection)
         {
             Vector2 leftOrigin = new Vector2(origin.x - bodyRadius, origin.y - bodyRadius);
@@ -48,12 +41,19 @@ namespace CharacterMovement
             float frontRaycastDistance = frontRaycast.distance;
             float backRaycastDistance = backRaycast.distance;
 
+            Vector2 averageNormal = (frontRaycast.normal + backRaycast.normal).normalized;
+
+            float slopeAngle = Vector2.Angle(Vector2.up, averageNormal);
+
+            float expectedDifference = (bodyRadius * 2f) * Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
+
             float heightDifference = Mathf.Abs(frontRaycastDistance - backRaycastDistance);
+            
+            bool isSteepObstacle = (heightDifference - expectedDifference) > _minObstacleThreshold;
+            bool isWithinMaxHeight = heightDifference <= _maxObstacleThreshold;
 
-            bool isDifferenceAcceptable = heightDifference >= _minObstacleThreshold && heightDifference <= _maxObstacleThreshold;
-
-            bool shouldAscend = isDifferenceAcceptable && frontRaycastDistance < backRaycastDistance;
-            bool shouldDescend = isDifferenceAcceptable && frontRaycastDistance > backRaycastDistance;
+            bool shouldAscend = isSteepObstacle && isWithinMaxHeight && frontRaycastDistance < backRaycastDistance;
+            bool shouldDescend = isSteepObstacle && isWithinMaxHeight && frontRaycastDistance > backRaycastDistance;
 
             TerrainReport report = new TerrainReport();
 
@@ -63,6 +63,7 @@ namespace CharacterMovement
             report.BodyDistance = middleRaycast.distance;
             report.MiddleHitPoint = middleRaycast.point;
             report.FrontHitPoint = frontRaycast.point;
+            report.SurfaceNormal = averageNormal;
             return report;
         }
     }
@@ -75,5 +76,6 @@ namespace CharacterMovement
         public float FrontDistance;
         public Vector2 FrontHitPoint;
         public Vector2 MiddleHitPoint;
+        public Vector2 SurfaceNormal;
     }
 }

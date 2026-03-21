@@ -111,10 +111,9 @@ namespace CharacterMovement
             float currentX = transform.position.x;
 
             float t = Mathf.InverseLerp(_startInterpolationX, _endInterpolationX, currentX);
-            
-            //float curvedT = t * t * (3f - 2f * t);
-            //float curvedT = t * t;
-            resultingOffset = t * heightDelta;
+
+            float curvedT = t* t * (3f - 2f * t);
+            resultingOffset = curvedT * heightDelta;
 
             return resultingOffset;
         }
