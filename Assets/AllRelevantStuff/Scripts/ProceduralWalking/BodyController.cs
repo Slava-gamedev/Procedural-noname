@@ -98,8 +98,7 @@ namespace CharacterMovement
             }
 
             float interpolationParameter = Mathf.InverseLerp(_startInterpolationX, _endInterpolationX, currentX);
-            resultingOffset = Mathf.Lerp(0, heightDelta, interpolationParameter);
-
+            resultingOffset = interpolationParameter * heightDelta;
            
             return resultingOffset;
         }
@@ -115,7 +114,7 @@ namespace CharacterMovement
             
             //float curvedT = t * t * (3f - 2f * t);
             //float curvedT = t * t;
-            resultingOffset = Mathf.Lerp(0, heightDelta, t);
+            resultingOffset = t * heightDelta;
 
             return resultingOffset;
         }
