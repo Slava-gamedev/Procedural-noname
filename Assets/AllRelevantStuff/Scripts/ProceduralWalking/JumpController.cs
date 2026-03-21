@@ -1,4 +1,6 @@
 using UnityEngine;
+using Cysharp.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace CharacterMovement
 {
@@ -9,20 +11,47 @@ namespace CharacterMovement
         [SerializeField] private BodyController _bodyController;
         [SerializeField] private LegsCoordinator _legsCoordinator;
         [SerializeField] private TerrainAnalyzer _terrainAnalyzer;
-
+        [SerializeField] private Rigidbody2D _rigidbody;
+ 
+        [Header("Values")]
         [SerializeField] private float _jumpForce = 10f;
         [SerializeField] private float _squatOffset = 0.3f;
         [SerializeField] private float _squatTime = 0.2f;
-        // Start is called once before the first execution of Update after the MonoBehaviour is created
-        void Start()
-        {
+       
 
+        private async UniTask StartJump()
+        {
+            Squat();
+
+            int squatTimeInMiliseconds = (int)(1000 * _squatTime);
+            await UniTask.Delay(squatTimeInMiliseconds);
+
+            Jump();
         }
 
-        // Update is called once per frame
-        void Update()
+        private void Squat()
         {
+            // do squat via BodyController
+        }
 
+
+        private void Jump()
+        {
+            // Notify relevant scripts about jump
+            ApplyForce();
+        }
+
+        private void ApplyForce()
+        {
+            Vector2 forceDirection = Vector2.up;
+
+            Vector2 forceVector = forceDirection * _jumpForce;
+            _rigidbody.AddForce(forceVector, ForceMode2D.Impulse);
+        }
+
+        private void HandleLanding()
+        {
+            // Notify relevant scripts about landing
         }
     }
 }
