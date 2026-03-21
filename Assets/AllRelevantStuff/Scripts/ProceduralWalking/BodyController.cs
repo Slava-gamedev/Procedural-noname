@@ -30,7 +30,7 @@ namespace CharacterMovement
             TerrainReport report = _terrainAnalyzer.CheckTerrain(transform.position,
                 _bodyRadius, _movementController.FacingDirection);
 
-            if(report.BodyDistance > _standingHeight)
+            if (report.BodyDistance > _standingHeight && _cachedReport == null)
             {
                 return;
             }
@@ -43,10 +43,9 @@ namespace CharacterMovement
 
             float heightCorrection = 0;
 
-            if(_cachedReport != null)
+            if (_cachedReport != null)
             {
-                float immediateJump = report.MiddleHitPoint.y - _cachedReport.Value.MiddleHitPoint.y;
-                heightCorrection = immediateJump;
+                heightCorrection = _cachedReport.Value.MiddleHitPoint.y - report.MiddleHitPoint.y;
             }
 
             float finalStandingHeight = _standingHeight + stepLengthOffset + terrainOffset + heightCorrection;
@@ -82,7 +81,7 @@ namespace CharacterMovement
             Vector2 hitPoint = reportValue.FrontHitPoint;
             float currentX = transform.position.x;
 
-            float heightDelta = reportValue.FrontDistance - reportValue.BodyDistance;
+            float heightDelta = reportValue.BodyDistance - reportValue.FrontDistance;
 
             if (!OneLegOnNewHeight(hitPoint.y))
             {
@@ -105,7 +104,7 @@ namespace CharacterMovement
         {
             float resultingOffset = 0;
             TerrainReport reportValue = _cachedReport.Value;
-            float heightDelta = reportValue.FrontDistance - reportValue.BodyDistance;
+            float heightDelta = reportValue.BodyDistance - reportValue.FrontDistance;
             float currentX = transform.position.x;
 
             float interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
@@ -139,7 +138,7 @@ namespace CharacterMovement
             float yDifferenceForLeftLeg = Mathf.Abs(newHeight - leftLegFoot.y);
             float yDifferenceForRightLeg = Mathf.Abs(newHeight - rightLegFoot.y);
 
-            if(yDifferenceForLeftLeg < yDifferenceThreshold && !_leftLeg.IsMoving
+            if (yDifferenceForLeftLeg < yDifferenceThreshold && !_leftLeg.IsMoving
                 || yDifferenceForRightLeg < yDifferenceThreshold && !_rightLeg.IsMoving)
             {
                 return true;
@@ -155,10 +154,6 @@ namespace CharacterMovement
 
             force = force * _rigidbody.mass;
 
-            if(force < 9.810f || force > 9.810f)
-            {
-                Debug.Log($"{force.ToString("F4")},   velocityY: {_rigidbody.linearVelocityY}");
-            }
             _rigidbody.AddForceY(force, ForceMode2D.Force);
         }
 

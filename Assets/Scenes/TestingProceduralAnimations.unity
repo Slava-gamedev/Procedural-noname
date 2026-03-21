@@ -758,7 +758,7 @@ MonoBehaviour:
   _groundLayer:
     serializedVersion: 2
     m_Bits: 8
-  _footWidth: 0.32
+  _footWidth: 0.3
   _minObstacleThreshold: 0.1
   _maxObstacleThreshold: 0.91
 --- !u!1 &391443143

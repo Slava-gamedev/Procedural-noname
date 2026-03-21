@@ -73,8 +73,8 @@ namespace CharacterMovement
             }
             else if (shouldDescend)
             {
-                report.StartInterpolationX = frontRaycast.point.x;
-                report.EndInterpolationX = frontRaycast.point.x + (directionXModifier * bodyRadius * 2);
+                report.StartInterpolationX = frontRaycast.point.x - (directionXModifier * bodyRadius / 2f);
+                report.EndInterpolationX = frontRaycast.point.x + (directionXModifier * bodyRadius / 2f);
             }
 
             return report;
