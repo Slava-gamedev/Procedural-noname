@@ -18,6 +18,9 @@ namespace CharacterMovement
         private float _bodyRadius;
         private TerrainReport? _cachedReport;
         private bool _startedAscending;
+        private float _startInterpolationX;
+        private float _endInterpolationX;
+        private FacingDirection _direction => _movementController.FacingDirection;
 
         private void Start()
         {
@@ -55,14 +58,14 @@ namespace CharacterMovement
 
         private float CalculateVerticalOffsetFromTerrain(TerrainReport terrainReport)
         {
+            CacheReport(terrainReport);
+
             if (terrainReport.ShouldAscend)
             {
-                CacheReport(terrainReport);
                 return GetOffsetFromAscending();
             }
             else if (terrainReport.ShouldDescend)
             {
-                CacheReport(terrainReport);
                 return GetOffsetFromDescending();
             }
             else
@@ -90,13 +93,14 @@ namespace CharacterMovement
 
             if (!_startedAscending)
             {
-                reportValue.StartInterpolationX = currentX;
-                _cachedReport = reportValue;
                 _startedAscending = true;
+                CalculateInterpolationPoints(reportValue);
             }
 
-            float interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
+            float interpolationParameter = Mathf.InverseLerp(_startInterpolationX, _endInterpolationX, currentX);
             resultingOffset = Mathf.Lerp(0, heightDelta, interpolationParameter);
+
+           
             return resultingOffset;
         }
 
@@ -107,8 +111,11 @@ namespace CharacterMovement
             float heightDelta = reportValue.BodyDistance - reportValue.FrontDistance;
             float currentX = transform.position.x;
 
-            float interpolationParameter = Mathf.InverseLerp(reportValue.StartInterpolationX, reportValue.EndInterpolationX, currentX);
-            resultingOffset = Mathf.Lerp(0, heightDelta, interpolationParameter);
+            float t = Mathf.InverseLerp(_startInterpolationX, _endInterpolationX, currentX);
+            
+            //float curvedT = t * t * (3f - 2f * t);
+            //float curvedT = t * t;
+            resultingOffset = Mathf.Lerp(0, heightDelta, t);
 
             return resultingOffset;
         }
@@ -119,6 +126,7 @@ namespace CharacterMovement
             {
                 _cachedReport = terrainReport;
                 _startedAscending = false;
+                CalculateInterpolationPoints(_cachedReport.Value);
             }
         }
 
@@ -169,6 +177,23 @@ namespace CharacterMovement
             return verticalOffset;
         }
 
+        private void CalculateInterpolationPoints(TerrainReport terrainReport)
+        {
+            float directionXModifier = _direction == FacingDirection.Right ? 1 : -1;
+            float currentX = transform.position.x;
+
+            if (terrainReport.ShouldAscend && _startedAscending)
+            {
+                _startInterpolationX = currentX;
+                _endInterpolationX = currentX + (directionXModifier * _bodyRadius);
+            }
+            else if (terrainReport.ShouldDescend)
+            {
+                _startInterpolationX = terrainReport.FrontHitPoint.x - (directionXModifier * _bodyRadius / 2f);
+                _endInterpolationX = terrainReport.FrontHitPoint.x + (directionXModifier * _bodyRadius / 2f);
+            }
+        }
+
         private void OnDrawGizmos()
         {
             if (_cachedReport != null)
@@ -176,8 +201,8 @@ namespace CharacterMovement
                 TerrainReport reportValue = _cachedReport.Value;
 
                 Gizmos.color = Color.red;
-                Vector2 start = new Vector2(reportValue.StartInterpolationX, transform.position.y);
-                Vector2 end = new Vector2(reportValue.EndInterpolationX, transform.position.y);
+                Vector2 start = new Vector2(_startInterpolationX, transform.position.y);
+                Vector2 end = new Vector2(_endInterpolationX, transform.position.y);
 
                 Gizmos.DrawLine(start, start + Vector2.down);
                 Gizmos.color = Color.yellow;

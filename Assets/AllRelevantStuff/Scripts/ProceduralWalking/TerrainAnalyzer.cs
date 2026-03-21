@@ -52,8 +52,6 @@ namespace CharacterMovement
 
             bool isDifferenceAcceptable = heightDifference >= _minObstacleThreshold && heightDifference <= _maxObstacleThreshold;
 
-            float directionXModifier = facingDirection == FacingDirection.Right ? 1 : -1;
-
             bool shouldAscend = isDifferenceAcceptable && frontRaycastDistance < backRaycastDistance;
             bool shouldDescend = isDifferenceAcceptable && frontRaycastDistance > backRaycastDistance;
 
@@ -65,18 +63,6 @@ namespace CharacterMovement
             report.BodyDistance = middleRaycast.distance;
             report.MiddleHitPoint = middleRaycast.point;
             report.FrontHitPoint = frontRaycast.point;
-
-            if (shouldAscend)
-            {
-                report.StartInterpolationX = frontRaycast.point.x - (directionXModifier * bodyRadius);
-                report.EndInterpolationX = frontRaycast.point.x + (directionXModifier * bodyRadius);
-            }
-            else if (shouldDescend)
-            {
-                report.StartInterpolationX = frontRaycast.point.x - (directionXModifier * bodyRadius / 2f);
-                report.EndInterpolationX = frontRaycast.point.x + (directionXModifier * bodyRadius / 2f);
-            }
-
             return report;
         }
     }
@@ -89,7 +75,5 @@ namespace CharacterMovement
         public float FrontDistance;
         public Vector2 FrontHitPoint;
         public Vector2 MiddleHitPoint;
-        public float StartInterpolationX;
-        public float EndInterpolationX;
     }
 }
