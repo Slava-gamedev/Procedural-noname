@@ -40,7 +40,7 @@ namespace CharacterMovement
 
             RaycastHit2D leftRaycast = Physics2D.Raycast(leftOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
             RaycastHit2D rightRaycast = Physics2D.Raycast(rightOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
-            RaycastHit2D bodyRaycast = Physics2D.Raycast(middleOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
+            RaycastHit2D middleRaycast = Physics2D.Raycast(middleOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
 
             RaycastHit2D frontRaycast =  facingDirection == FacingDirection.Right ? rightRaycast : leftRaycast;
             RaycastHit2D backRaycast =  facingDirection == FacingDirection.Right ? leftRaycast : rightRaycast;
@@ -62,7 +62,8 @@ namespace CharacterMovement
             report.ShouldDescend = shouldDescend;
             report.ShouldAscend = shouldAscend;
             report.FrontDistance = frontRaycastDistance;
-            report.BodyDistance = bodyRaycast.distance;
+            report.BodyDistance = middleRaycast.distance;
+            report.MiddleHitPoint = middleRaycast.point;
             report.FrontHitPoint = frontRaycast.point;
 
             if (shouldAscend)
@@ -87,6 +88,7 @@ namespace CharacterMovement
         public float BodyDistance;
         public float FrontDistance;
         public Vector2 FrontHitPoint;
+        public Vector2 MiddleHitPoint;
         public float StartInterpolationX;
         public float EndInterpolationX;
     }

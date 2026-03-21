@@ -37,10 +37,19 @@ namespace CharacterMovement
 
             float currentDistanceToGround = report.BodyDistance;
 
-            float heightOffsetFromTerrain = CalculateVerticalOffsetFromTerrain(report);
+            float terrainOffset = CalculateVerticalOffsetFromTerrain(report);
 
-            float verticalOffsetFromSteoLength = CalculateVerticalOffsetFromStepLength();
-            float finalStandingHeight = _standingHeight + verticalOffsetFromSteoLength + heightOffsetFromTerrain;
+            float stepLengthOffset = CalculateVerticalOffsetFromStepLength();
+
+            float heightCorrection = 0;
+
+            if(_cachedReport != null)
+            {
+                float immediateJump = report.MiddleHitPoint.y - _cachedReport.Value.MiddleHitPoint.y;
+                heightCorrection = immediateJump;
+            }
+
+            float finalStandingHeight = _standingHeight + stepLengthOffset + terrainOffset + heightCorrection;
 
             ApplyForceToRigidbody(currentDistanceToGround, finalStandingHeight);
         }
@@ -146,6 +155,10 @@ namespace CharacterMovement
 
             force = force * _rigidbody.mass;
 
+            if(force < 9.810f || force > 9.810f)
+            {
+                Debug.Log($"{force.ToString("F4")},   velocityY: {_rigidbody.linearVelocityY}");
+            }
             _rigidbody.AddForceY(force, ForceMode2D.Force);
         }
 
