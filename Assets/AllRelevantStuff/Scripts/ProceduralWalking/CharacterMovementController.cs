@@ -21,6 +21,7 @@ namespace CharacterMovement
         [SerializeField] private SpriteRenderer _bodySprite;
         private Vector2 _movementDirection;
         private FacingDirection _facingDirection;
+        private bool _isMovementBlocked;
 
         public FacingDirection FacingDirection => _facingDirection;
         public float LocomotionCycle {  get; private set; }
@@ -29,6 +30,10 @@ namespace CharacterMovement
         public float CycleFrequency => _cycleFrequency;
 
 
+        public void SetMovementBlocked(bool isBlocked)
+        {
+            _isMovementBlocked = isBlocked;
+        }
 
         void Update()
         {
@@ -39,6 +44,7 @@ namespace CharacterMovement
         private void FixedUpdate()
         {
             Move();
+            StopIfBlocked();
         }
 
         private void ReadInput()
@@ -54,9 +60,23 @@ namespace CharacterMovement
                 horizontalInput = -1f;
             }
 
-            _movementDirection = new Vector2(horizontalInput, 0f);
+            if (_isMovementBlocked)
+            {
+                bool tryingToMoveIntoObstacle = (horizontalInput > 0 && FacingDirection == FacingDirection.Right) ||
+                                               (horizontalInput < 0 && FacingDirection == FacingDirection.Left);
 
-            UpdateSpriteOrientation(horizontalInput);
+                if (tryingToMoveIntoObstacle)
+                {
+                    horizontalInput = 0;
+                }
+            }
+
+            if(horizontalInput!= 0)
+            {
+                UpdateSpriteOrientation(horizontalInput);
+            }
+
+            _movementDirection = new Vector2(horizontalInput, 0f);
         }
 
         private void Move()
@@ -100,6 +120,24 @@ namespace CharacterMovement
 
             _facingDirection = horizontalInput > 0 ? FacingDirection.Right : FacingDirection.Left;
             _bodySprite.flipX = horizontalInput > 0;
+        }
+
+        private void StopIfBlocked()
+        {
+            if (_isMovementBlocked == false)
+            {
+                return;
+            }
+
+            float currentVelocityX = _rigidbody.linearVelocityX;
+
+            bool movingIntoRightObstacle = (currentVelocityX > 0 && FacingDirection == FacingDirection.Right);
+            bool movingIntoLeftObstacle = (currentVelocityX < 0 && FacingDirection == FacingDirection.Left);
+
+            if (movingIntoRightObstacle || movingIntoLeftObstacle)
+            {
+                _rigidbody.linearVelocity = new Vector2(0f, _rigidbody.linearVelocityY);
+            }
         }
     }
 }

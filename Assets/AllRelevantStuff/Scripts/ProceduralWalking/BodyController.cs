@@ -38,6 +38,8 @@ namespace CharacterMovement
                 return;
             }
 
+            _movementController.SetMovementBlocked(report.IsMovementBlocked);
+
             float currentDistanceToGround = report.BodyDistance;
 
             float terrainOffset = CalculateVerticalOffsetFromTerrain(report);

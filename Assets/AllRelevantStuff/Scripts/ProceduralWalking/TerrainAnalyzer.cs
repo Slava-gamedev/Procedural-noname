@@ -8,21 +8,21 @@ namespace CharacterMovement
         [SerializeField] private float _footWidth;
         [SerializeField] private float _minObstacleThreshold = 0.1f;
         [SerializeField] private float _maxObstacleThreshold = 0.91f;
+        [SerializeField] private float _maxSlopeAngle = 60f;
         private float _maxRaycastDistance = 30f;
         private float _upwardOffset = 3f;
 
-
-        public float GetGroundHeightAtPosition(Vector2 worldPosition)
+        public Vector2 CheckAtPosition(Vector2 worldPosition)
         {
             RaycastHit2D hit = Physics2D.CircleCast(worldPosition + Vector2.up * _upwardOffset,
                 _footWidth / 2, Vector2.down, _maxRaycastDistance, _groundLayer);
 
             if (hit.collider != null)
             {
-                return hit.point.y;
+                return hit.point;
             }
 
-            return worldPosition.y;
+            return worldPosition;
         }
 
         public TerrainReport CheckTerrain(Vector2 origin, float bodyRadius, FacingDirection facingDirection)
@@ -52,11 +52,16 @@ namespace CharacterMovement
             bool isSteepObstacle = (heightDifference - expectedDifference) > _minObstacleThreshold;
             bool isWithinMaxHeight = heightDifference <= _maxObstacleThreshold;
 
+
+            bool isSlopeTooSteep = slopeAngle > _maxSlopeAngle;
+            bool isMovementBlocked = (!isWithinMaxHeight || isSlopeTooSteep) && (frontRaycastDistance < backRaycastDistance);
+
             bool shouldAscend = isSteepObstacle && isWithinMaxHeight && frontRaycastDistance < backRaycastDistance;
             bool shouldDescend = isSteepObstacle && isWithinMaxHeight && frontRaycastDistance > backRaycastDistance;
 
             TerrainReport report = new TerrainReport();
 
+            report.IsMovementBlocked = isMovementBlocked;
             report.ShouldDescend = shouldDescend;
             report.ShouldAscend = shouldAscend;
             report.FrontDistance = frontRaycastDistance;
@@ -72,6 +77,7 @@ namespace CharacterMovement
     {
         public bool ShouldAscend;
         public bool ShouldDescend;
+        public bool IsMovementBlocked;
         public float BodyDistance;
         public float FrontDistance;
         public Vector2 FrontHitPoint;

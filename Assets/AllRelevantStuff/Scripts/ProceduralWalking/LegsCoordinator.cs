@@ -79,7 +79,7 @@ namespace CharacterMovement
 
             Vector2 pelvisPos = leg.ThighPivotPosition;
             Vector2 target = pelvisPos + Vector2.right * direction * stepLength;
-            target.y = _groundDetector.GetGroundHeightAtPosition(target);
+            target = _groundDetector.CheckAtPosition(target);
 
             return target;
         }
