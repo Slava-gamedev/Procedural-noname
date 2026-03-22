@@ -83,6 +83,7 @@
   <Project Path="Unity.RenderPipelines.Universal.Shaders.csproj" />
   <Project Path="Unity.RenderPipelines.Core.Runtime.Shared.csproj" />
   <Project Path="ScriptablePacker.csproj" />
+  <Project Path="Unity.InputSystem.RebindingUI.csproj" />
   <Project Path="Unity.ScriptableBuildPipeline.csproj" />
   <Project Path="UniTask.Addressables.csproj" />
   <Project Path="Unity.Collections.Editor.csproj" />

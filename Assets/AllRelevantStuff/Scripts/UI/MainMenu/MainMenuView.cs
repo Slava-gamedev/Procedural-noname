@@ -1,16 +1,60 @@
+using System;
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class MainMenuView : MonoBehaviour
+namespace UI
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public class MainMenuView : MonoBehaviour
     {
-        
-    }
+        public event Action OnPlayPressed;
+        public event Action OnSettingsPressed;
+        public event Action OnExitPressed;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
+        [SerializeField] private Button _playButton;
+        [SerializeField] private Button _settingsButton;
+        [SerializeField] private Button _exitButton;
+        [SerializeField] private TMP_Text _playText;
+        [SerializeField] private TMP_Text _settingsText;
+        [SerializeField] private TMP_Text _exitText;
+
+        public void Init(MainMenuModel model)
+        {
+            _playText.text = model.PlayText;
+            _settingsText.text = model.SettingsText;
+            _exitText.text = model.ExitText;
+
+            UnsubscribeButtons();
+            SubscribeButtons();
+        }
+
+        private void SubscribeButtons()
+        {
+            _playButton.onClick.AddListener(OnPlayButtonPressed);
+            _settingsButton.onClick.AddListener(OnSettingsButtonPressed);
+            _exitButton.onClick.AddListener(OnExitButtonPressed);
+        }
+
+        private void UnsubscribeButtons()
+        {
+            _playButton.onClick.RemoveListener(OnPlayButtonPressed);
+            _settingsButton.onClick.RemoveListener(OnSettingsButtonPressed);
+            _exitButton.onClick.RemoveListener(OnExitButtonPressed);
+        }
+
+        private void OnPlayButtonPressed()
+        {
+            OnPlayPressed?.Invoke();
+        }
+
+        private void OnSettingsButtonPressed()
+        {
+            OnSettingsPressed?.Invoke();
+        }
+
+        private void OnExitButtonPressed()
+        {
+            OnExitPressed?.Invoke();
+        }
     }
 }
