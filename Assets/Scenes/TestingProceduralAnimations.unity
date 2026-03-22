@@ -660,7 +660,7 @@ MonoBehaviour:
   _movementController: {fileID: 245601051}
   _rightLeg: {fileID: 1613814893}
   _leftLeg: {fileID: 2675618}
-  _groundDetector: {fileID: 245601059}
+  _terrainAnalyzer: {fileID: 245601059}
   _minStepDuration: 0.1
   _maxStepDuration: 0.6
 --- !u!114 &245601056
@@ -782,7 +782,7 @@ MonoBehaviour:
   _legsCoordinator: {fileID: 245601052}
   _terrainAnalyzer: {fileID: 245601059}
   _rigidbody: {fileID: 245601057}
-  _jumpForce: 16
+  _jumpForce: 10
   _squatOffset: 0.6
   _squatTime: 0.5
   _jumpInProgress: 0

@@ -21,10 +21,18 @@ namespace CharacterMovement
         private float _startInterpolationX;
         private float _endInterpolationX;
         private float _temporaryOffset = 0;
+        private bool _isSpringActive = true;
+
         private FacingDirection _direction => _movementController.FacingDirection;
 
         public float StandingHeight => _standingHeight;
         public float BodyRadius => _bodyRadius;
+
+
+        public void SetSpringActive(bool isActive)
+        {
+            _isSpringActive = isActive;
+        }
 
         public void SetTemporaryHeightOffset(float offset)
         {
@@ -42,7 +50,7 @@ namespace CharacterMovement
             TerrainReport report = _terrainAnalyzer.CheckTerrain(transform.position,
                 _bodyRadius, _movementController.FacingDirection);
 
-            if (report.BodyDistance > _standingHeight && _cachedReport == null)
+            if ((report.BodyDistance > _standingHeight && _cachedReport == null) || !_isSpringActive)
             {
                 return;
             }

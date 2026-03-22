@@ -69,32 +69,39 @@ namespace CharacterMovement
             return report;
         }
 
-        public JumpReport CheckJump(Vector2 origin, float standingHeight, float bodyRadius, float velocityY)
+        public JumpReport CheckJump(Vector2 origin, float standingHeight, float bodyRadius, Rigidbody2D rigidbody)
         {
             Vector2 middleOrigin = new Vector2(origin.x, origin.y - bodyRadius);
             RaycastHit2D middleRaycast = Physics2D.Raycast(middleOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
 
-            int framesForPreparation = 8;
-
-            float fallPerFrame = Mathf.Abs(velocityY) * Time.fixedDeltaTime;
-            if (fallPerFrame < 0.001f)
-            {
-                fallPerFrame = 0.001f;
-            }
-
             JumpReport jumpReport = new JumpReport();
             if(middleRaycast.collider != null)
             {
-                int framesBeforeLanding = (int)(middleRaycast.distance / fallPerFrame);
+                float currentDistance = middleRaycast.distance;
+                jumpReport.IsGrounded = currentDistance <= standingHeight;
 
-                bool isGrounded = middleRaycast.distance <= standingHeight;
-                bool ShouldPrepareForLanding = !isGrounded && framesBeforeLanding <= framesForPreparation;
+                float distanceBeforeLanding = currentDistance - standingHeight;
 
-                jumpReport.IsGrounded = isGrounded;
-                jumpReport.ShouldPrepareForLanding = ShouldPrepareForLanding;
+                if(distanceBeforeLanding > 0)
+                {
+                    jumpReport.TimeToLanding = CalculateTimeToLanding(distanceBeforeLanding, rigidbody);
+                }
+
+                jumpReport.ShouldPrepareForLanding = !jumpReport.IsGrounded;
             }
 
             return jumpReport;
+        }
+
+        private float CalculateTimeToLanding(float distanceBeforeLanding, Rigidbody2D rigidbody)
+        {
+            float startingVelocity = Mathf.Abs(rigidbody.linearVelocityY);
+            float acceleration = Mathf.Abs(Physics2D.gravity.y * rigidbody.gravityScale);
+
+            float discriminant = startingVelocity * startingVelocity + 2f * acceleration * distanceBeforeLanding;
+
+            float timeToLanding = (Mathf.Sqrt(discriminant) - startingVelocity) / acceleration;
+            return timeToLanding;
         }
     }
 
@@ -114,5 +121,6 @@ namespace CharacterMovement
     {
         public bool IsGrounded;
         public bool ShouldPrepareForLanding;
+        public float TimeToLanding;
     }
 }

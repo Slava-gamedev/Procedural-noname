@@ -17,7 +17,7 @@ namespace CharacterMovement
         [SerializeField] private float _squatOffset = 0.3f;
         [SerializeField] private float _squatTime = 0.2f;
         [SerializeField] private bool _jumpInProgress = false;
-
+        private bool _isPreparingForLanding;
 
         private void Update()
         {
@@ -54,6 +54,7 @@ namespace CharacterMovement
         private void Jump()
         {
             _bodyController.SetTemporaryHeightOffset(0);
+            _bodyController.SetSpringActive(false);
 
             ApplyForce();
         }
@@ -75,40 +76,48 @@ namespace CharacterMovement
                 if(velocityY < 0f)
                 {
                     JumpReport jumpReport = _terrainAnalyzer.CheckJump(transform.position, _bodyController.StandingHeight,
-                        _bodyController.BodyRadius,velocityY);
+                        _bodyController.BodyRadius, _rigidbody);
 
                     if (jumpReport.ShouldPrepareForLanding)
                     {
-                        PrepareForLanding();
+                        PrepareForLanding(jumpReport);
                     }
                     else if (jumpReport.IsGrounded)
                     {
                         break;
                     }
-
                 }
                 
                 await UniTask.Yield(PlayerLoopTiming.FixedUpdate);
             }
         }
 
-        private void PrepareForLanding()
+        private void PrepareForLanding(JumpReport report)
         {
-
+            if (_isPreparingForLanding == false)
+            {
+                _isPreparingForLanding = true;
+                _legsCoordinator.StartLandingPreparation(report.TimeToLanding);
+            }
+            else
+            {
+                _legsCoordinator.UpdateLandingPoints();
+            }
         }
 
         private void HandleLanding()
         {
             _jumpInProgress = false;
+            _isPreparingForLanding = false;
             _legsCoordinator.SetAirMode(_jumpInProgress);
+            _bodyController.SetSpringActive(true);
+
         }
 
         private bool IsGrounded()
         {
-            float velocityY = _rigidbody.linearVelocityY;
-
             JumpReport jumpReport = _terrainAnalyzer.CheckJump(transform.position, _bodyController.StandingHeight,
-                        _bodyController.BodyRadius, velocityY);
+                        _bodyController.BodyRadius, _rigidbody);
 
             return jumpReport.IsGrounded;
         }

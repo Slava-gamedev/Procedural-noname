@@ -21,8 +21,10 @@ namespace CharacterMovement
         private Vector2 _startStepPosition;
         private Vector2 _targetStepPosition;
         private float _angleDirectionModifier;
-        private bool _isInAirPose = false;
+        private bool _isInAir = false;
+        private bool _preparingForLanding = false;
         private Vector2 _startLocalOffset;
+        private float _landingPreparationDuration;
 
         public float FullLegLength => _thighLength + _shinLength;
         public bool IsMoving { get; private set; }
@@ -37,9 +39,25 @@ namespace CharacterMovement
             _cachedDirectionToTarget = GetCurrentDirectionToTarget();
         }
 
-        public void SetInAirPose(bool inAir)
+        public void StartPreparingForLanding(Vector2 targetPosition, float timeBeforeLanding)
         {
-            _isInAirPose = inAir;
+            _preparingForLanding = true;
+            _targetStepPosition = targetPosition;
+            _startStepPosition = CurrentFootPosition;
+            _elapsedTime = 0f;
+            _landingPreparationDuration = timeBeforeLanding;
+        }
+
+        public void UpdateLandingTarget(Vector2 landingTarget)
+        {
+            _targetStepPosition = landingTarget;
+        }
+
+        public void SetInAir(bool inAir)
+        {
+            _isInAir = inAir;
+            _preparingForLanding = false;
+
             if (inAir)
             {
                 IsMoving = false;
@@ -65,9 +83,16 @@ namespace CharacterMovement
 
         private void Update()
         {
-            if (_isInAirPose)
+            if (_isInAir)
             {
-                AirPoseUpdate();
+                if (_preparingForLanding)
+                {
+                    PrepareForLandingUpdate();
+                }
+                else
+                {
+                    AirPoseUpdate();
+                }
                 UpdateInverseKinematics();
                 return;
             }
@@ -86,6 +111,15 @@ namespace CharacterMovement
         {
             UpdateFootPosition();
             UpdateInverseKinematics();
+        }
+
+        private void PrepareForLandingUpdate()
+        {
+            _elapsedTime += Time.deltaTime;
+            float timeParameter = _elapsedTime / _landingPreparationDuration;
+            float smoothT = Mathf.SmoothStep(0, 1, timeParameter);
+
+            _footTarget.position = Vector2.Lerp(_startStepPosition, _targetStepPosition, smoothT);
         }
 
         private void AirPoseUpdate()

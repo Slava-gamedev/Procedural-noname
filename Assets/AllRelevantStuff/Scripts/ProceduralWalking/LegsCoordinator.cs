@@ -10,18 +10,40 @@ namespace CharacterMovement
         [SerializeField] private CharacterMovementController _movementController;
         [SerializeField] private LegIKController _rightLeg;
         [SerializeField] private LegIKController _leftLeg;
-        [SerializeField] private TerrainAnalyzer _groundDetector;
+        [SerializeField] private TerrainAnalyzer _terrainAnalyzer;
 
         [SerializeField] private float _minStepDuration;
         [SerializeField] private float _maxStepDuration;
         private float _previousCycle;
         private bool _airMode;
 
+        public void StartLandingPreparation(float timeBeforeLanding)
+        {
+            if (_airMode)
+            {
+                Vector2 leftLegTarget = _terrainAnalyzer.CheckAtPosition(_leftLeg.ThighPivotPosition);
+                Vector2 rightLegTarget = _terrainAnalyzer.CheckAtPosition(_rightLeg.ThighPivotPosition);
+
+                _leftLeg.StartPreparingForLanding(leftLegTarget, timeBeforeLanding);
+                _rightLeg.StartPreparingForLanding(rightLegTarget, timeBeforeLanding);
+            }
+        }
+
+        public void UpdateLandingPoints()
+        {
+            Vector2 leftTarget = _terrainAnalyzer.CheckAtPosition(_leftLeg.ThighPivotPosition);
+            Vector2 rightTarget = _terrainAnalyzer.CheckAtPosition(_rightLeg.ThighPivotPosition);
+
+            _leftLeg.UpdateLandingTarget(leftTarget);
+            _rightLeg.UpdateLandingTarget(rightTarget);
+        }
+
+
         public void SetAirMode(bool airMode)
         {
             _airMode = airMode;
-            _rightLeg.SetInAirPose(_airMode);
-            _leftLeg.SetInAirPose(_airMode);
+            _rightLeg.SetInAir(_airMode);
+            _leftLeg.SetInAir(_airMode);
             if (!_airMode)
             {
                 RepositionLegs();
@@ -96,7 +118,7 @@ namespace CharacterMovement
 
             Vector2 pelvisPos = leg.ThighPivotPosition;
             Vector2 target = pelvisPos + Vector2.right * direction * stepLength;
-            target = _groundDetector.CheckAtPosition(target);
+            target = _terrainAnalyzer.CheckAtPosition(target);
 
             return target;
         }
