@@ -10,6 +10,8 @@ namespace CharacterMovement
         [SerializeField] private Transform _shinPivot;
 
         [SerializeField] private float _stepHeight = 0.3f;
+        [SerializeField] private Vector2 _airPoseOffset;
+        [SerializeField] private float _tuckTime;
 
         private float _currentStepDuration;
         private float _elapsedTime;
@@ -18,19 +20,32 @@ namespace CharacterMovement
         private Vector2 _cachedDirectionToTarget;
         private Vector2 _startStepPosition;
         private Vector2 _targetStepPosition;
+        private float _angleDirectionModifier;
+        private bool _isInAirPose = false;
+        private Vector2 _startLocalOffset;
 
         public float FullLegLength => _thighLength + _shinLength;
         public bool IsMoving { get; private set; }
         public Vector2 CurrentFootPosition => _footTarget.position;
         public Vector2 ThighPivotPosition => _thighPivot.position;
         public Vector2 TargetFootPosition => _targetStepPosition;
-        private float _angleDirectionModifier;
 
         private void Awake()
         {
             _thighLength = Vector2.Distance(_thighPivot.position, _shinPivot.position);
             _shinLength = Vector2.Distance(_shinPivot.position, _footTarget.position);
             _cachedDirectionToTarget = GetCurrentDirectionToTarget();
+        }
+
+        public void SetInAirPose(bool inAir)
+        {
+            _isInAirPose = inAir;
+            if (inAir)
+            {
+                IsMoving = false;
+                _elapsedTime = 0f;
+                _startLocalOffset = (Vector2)_footTarget.position - (Vector2)_thighPivot.position;
+            }
         }
 
         public void UpdateFacingDirection(FacingDirection facingDirection)
@@ -50,6 +65,13 @@ namespace CharacterMovement
 
         private void Update()
         {
+            if (_isInAirPose)
+            {
+                AirPoseUpdate();
+                UpdateInverseKinematics();
+                return;
+            }
+
             if (IsMoving)
             {
                 StepUpdate();
@@ -64,6 +86,18 @@ namespace CharacterMovement
         {
             UpdateFootPosition();
             UpdateInverseKinematics();
+        }
+
+        private void AirPoseUpdate()
+        {
+            Vector2 targetOffset = new Vector2(_airPoseOffset.x * _angleDirectionModifier, _airPoseOffset.y);
+
+            _elapsedTime += Time.deltaTime;
+            float timeParameter = _elapsedTime / _tuckTime;
+            float smoothT = Mathf.SmoothStep(0, 1, timeParameter);
+            Vector2 offset = Vector2.Lerp(_startLocalOffset, targetOffset, smoothT);
+
+            _footTarget.position = (Vector2)_thighPivot.position + offset;
         }
 
         private void UpdateFootPosition()

@@ -44,14 +44,11 @@ namespace CharacterMovement
             Vector2 averageNormal = (frontRaycast.normal + backRaycast.normal).normalized;
 
             float slopeAngle = Vector2.Angle(Vector2.up, averageNormal);
-
             float expectedDifference = (bodyRadius * 2f) * Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
-
             float heightDifference = Mathf.Abs(frontRaycastDistance - backRaycastDistance);
             
             bool isSteepObstacle = (heightDifference - expectedDifference) > _minObstacleThreshold;
             bool isWithinMaxHeight = heightDifference <= _maxObstacleThreshold;
-
 
             bool isSlopeTooSteep = slopeAngle > _maxSlopeAngle;
             bool isMovementBlocked = (!isWithinMaxHeight || isSlopeTooSteep) && (frontRaycastDistance < backRaycastDistance);
@@ -71,6 +68,34 @@ namespace CharacterMovement
             report.SurfaceNormal = averageNormal;
             return report;
         }
+
+        public JumpReport CheckJump(Vector2 origin, float standingHeight, float bodyRadius, float velocityY)
+        {
+            Vector2 middleOrigin = new Vector2(origin.x, origin.y - bodyRadius);
+            RaycastHit2D middleRaycast = Physics2D.Raycast(middleOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
+
+            int framesForPreparation = 8;
+
+            float fallPerFrame = Mathf.Abs(velocityY) * Time.fixedDeltaTime;
+            if (fallPerFrame < 0.001f)
+            {
+                fallPerFrame = 0.001f;
+            }
+
+            JumpReport jumpReport = new JumpReport();
+            if(middleRaycast.collider != null)
+            {
+                int framesBeforeLanding = (int)(middleRaycast.distance / fallPerFrame);
+
+                bool isGrounded = middleRaycast.distance <= standingHeight;
+                bool ShouldPrepareForLanding = !isGrounded && framesBeforeLanding <= framesForPreparation;
+
+                jumpReport.IsGrounded = isGrounded;
+                jumpReport.ShouldPrepareForLanding = ShouldPrepareForLanding;
+            }
+
+            return jumpReport;
+        }
     }
 
     public struct TerrainReport
@@ -83,5 +108,11 @@ namespace CharacterMovement
         public Vector2 FrontHitPoint;
         public Vector2 MiddleHitPoint;
         public Vector2 SurfaceNormal;
+    }
+
+    public struct JumpReport
+    {
+        public bool IsGrounded;
+        public bool ShouldPrepareForLanding;
     }
 }

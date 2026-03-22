@@ -20,7 +20,16 @@ namespace CharacterMovement
         private bool _startedAscending;
         private float _startInterpolationX;
         private float _endInterpolationX;
+        private float _temporaryOffset = 0;
         private FacingDirection _direction => _movementController.FacingDirection;
+
+        public float StandingHeight => _standingHeight;
+        public float BodyRadius => _bodyRadius;
+
+        public void SetTemporaryHeightOffset(float offset)
+        {
+            _temporaryOffset = offset;
+        }
 
         private void Start()
         {
@@ -53,7 +62,7 @@ namespace CharacterMovement
                 heightCorrection = _cachedReport.Value.MiddleHitPoint.y - report.MiddleHitPoint.y;
             }
 
-            float finalStandingHeight = _standingHeight + stepLengthOffset + terrainOffset + heightCorrection;
+            float finalStandingHeight = _standingHeight + stepLengthOffset + terrainOffset + heightCorrection + _temporaryOffset;
 
             ApplyForceToRigidbody(currentDistanceToGround, finalStandingHeight);
         }

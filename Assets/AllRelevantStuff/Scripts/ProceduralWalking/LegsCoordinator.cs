@@ -15,9 +15,26 @@ namespace CharacterMovement
         [SerializeField] private float _minStepDuration;
         [SerializeField] private float _maxStepDuration;
         private float _previousCycle;
+        private bool _airMode;
+
+        public void SetAirMode(bool airMode)
+        {
+            _airMode = airMode;
+            _rightLeg.SetInAirPose(_airMode);
+            _leftLeg.SetInAirPose(_airMode);
+            if (!_airMode)
+            {
+                RepositionLegs();
+            }
+        }
 
         private void Update()
         {
+            if (_airMode)
+            {
+                return;
+            }
+
             if (!IsMoving())
             {
                 RepositionLegs();

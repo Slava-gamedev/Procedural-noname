@@ -169,6 +169,8 @@ MonoBehaviour:
   _thighPivot: {fileID: 989154282}
   _shinPivot: {fileID: 2109922466}
   _stepHeight: 0.3
+  _airPoseOffset: {x: 0, y: -0.9}
+  _tuckTime: 0.5
 --- !u!1 &110266482
 GameObject:
   m_ObjectHideFlags: 0
@@ -599,6 +601,7 @@ GameObject:
   - component: {fileID: 245601058}
   - component: {fileID: 245601057}
   - component: {fileID: 245601059}
+  - component: {fileID: 245601060}
   m_Layer: 0
   m_Name: Character_Root
   m_TagString: Untagged
@@ -761,6 +764,28 @@ MonoBehaviour:
   _footWidth: 0.3
   _minObstacleThreshold: 0.1
   _maxObstacleThreshold: 0.91
+  _maxSlopeAngle: 60
+--- !u!114 &245601060
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 245601049}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a79d1ced3d946494abdd5903e6db930c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _movementController: {fileID: 245601051}
+  _bodyController: {fileID: 245601056}
+  _legsCoordinator: {fileID: 245601052}
+  _terrainAnalyzer: {fileID: 245601059}
+  _rigidbody: {fileID: 245601057}
+  _jumpForce: 16
+  _squatOffset: 0.6
+  _squatTime: 0.5
+  _jumpInProgress: 0
 --- !u!1 &391443143
 GameObject:
   m_ObjectHideFlags: 0
@@ -2151,6 +2176,8 @@ MonoBehaviour:
   _thighPivot: {fileID: 2020170245}
   _shinPivot: {fileID: 1208866194}
   _stepHeight: 0.3
+  _airPoseOffset: {x: 0, y: -0.9}
+  _tuckTime: 0.5
 --- !u!1 &1645069091
 GameObject:
   m_ObjectHideFlags: 0
@@ -2258,7 +2285,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _playerCharacter: {fileID: 245601050}
-  _followSpeed: 4
+  _followSpeed: 5
 --- !u!114 &1645069096
 MonoBehaviour:
   m_ObjectHideFlags: 0
