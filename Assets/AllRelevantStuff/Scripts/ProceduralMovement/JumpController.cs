@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using static UnityEngine.InputSystem.InputAction;
 
 namespace CharacterMovement
 {
@@ -18,6 +19,24 @@ namespace CharacterMovement
         [SerializeField] private float _squatTime = 0.2f;
         [SerializeField] private bool _jumpInProgress = false;
         private bool _isPreparingForLanding;
+
+        private void OnEnable()
+        {
+            InputReader.Actions.InGame.Jump.performed += HandleJumpPress;
+        }
+
+        private void OnDisable()
+        {
+            InputReader.Actions.InGame.Jump.performed -= HandleJumpPress;
+        }
+
+        private void HandleJumpPress(CallbackContext callbackContext)
+        {
+            if (!_jumpInProgress)
+            {
+                StartJump().Forget();
+            }
+        }
 
         private void Update()
         {
