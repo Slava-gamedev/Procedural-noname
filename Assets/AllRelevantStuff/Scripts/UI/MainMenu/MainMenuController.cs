@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace UI
 {
@@ -8,7 +9,7 @@ namespace UI
         private const string kPlay = "Play";
         private const string kSettings = "Settings";
         private const string kExit = "Exit";
-
+        private const string kScene = "Level_1";
 
         [SerializeField] private MainMenuView _view;
         [SerializeField] private SettingsMenuController _settingsMenu;
@@ -67,7 +68,7 @@ namespace UI
 
         private void OnPlayClicked()
         {
-
+            SceneManager.LoadScene(kScene);
         }
 
         private void OnSettingsClicked()
