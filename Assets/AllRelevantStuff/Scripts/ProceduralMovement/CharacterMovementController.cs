@@ -49,16 +49,7 @@ namespace CharacterMovement
 
         private void ReadInput()
         {
-            float horizontalInput = 0f;
-
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                horizontalInput = 1f;
-            }
-            else if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                horizontalInput = -1f;
-            }
+            float horizontalInput = InputReader.Actions.InGame.Move.ReadValue<float>();
 
             if (_isMovementBlocked)
             {
