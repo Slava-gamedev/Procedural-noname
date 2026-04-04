@@ -210,26 +210,5 @@ namespace CharacterMovement
                 _endInterpolationX = terrainReport.FrontHitPoint.x + (directionXModifier * _bodyRadius / 2f);
             }
         }
-
-        private void OnDrawGizmos()
-        {
-            if (_cachedReport != null)
-            {
-                TerrainReport reportValue = _cachedReport.Value;
-
-                Gizmos.color = Color.red;
-                Vector2 start = new Vector2(_startInterpolationX, transform.position.y);
-                Vector2 end = new Vector2(_endInterpolationX, transform.position.y);
-
-                Gizmos.DrawLine(start, start + Vector2.down);
-                Gizmos.color = Color.yellow;
-                Gizmos.DrawLine(end, end + Vector2.down);
-
-                Gizmos.color = Color.green;
-                Vector2 middle = transform.position;
-                Gizmos.DrawLine(middle, middle + Vector2.down);
-
-            }
-        }
     }
 }

@@ -9,12 +9,13 @@ namespace UI
         private const string kPlay = "Play";
         private const string kSettings = "Settings";
         private const string kExit = "Exit";
-        private const string kScene = "Level_1";
 
         [SerializeField] private MainMenuView _view;
         [SerializeField] private SettingsMenuController _settingsMenu;
         private MainMenuModel _model;
         private LocalizationManager _localizationManager;
+        private LevelDataService _levelDataService;
+        private const string kLevelSceneFormat = "Level_{0}";
 
         public void Show()
         {
@@ -34,6 +35,7 @@ namespace UI
         private void Init()
         {
             _localizationManager = LocalizationManager.Instance;
+            _levelDataService = LevelDataService.Instance;
 
             BuildModel();
             _view.Init(_model);
@@ -68,7 +70,11 @@ namespace UI
 
         private void OnPlayClicked()
         {
-            SceneManager.LoadScene(kScene);
+            _levelDataService.SetLevel(1);
+
+            int levelNumber = _levelDataService.CurrentLevel;
+            string levelName = string.Format(kLevelSceneFormat, levelNumber);
+            SceneManager.LoadScene(levelName);
         }
 
         private void OnSettingsClicked()
