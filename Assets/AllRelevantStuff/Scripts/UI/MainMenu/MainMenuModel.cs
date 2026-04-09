@@ -1,6 +1,6 @@
 namespace UI
 {
-    public class MainMenuModel
+    public class MainMenuModel : IPopupModel
     {
         public string PlayText;
         public string SettingsText;

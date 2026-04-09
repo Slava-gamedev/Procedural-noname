@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace UI
 {
-    public class LevelCompletedMenuModel
+    public class LevelCompletedMenuModel : IPopupModel
     {
         public string NextLevelText;
         public string MainMenuText;

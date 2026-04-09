@@ -3,9 +3,9 @@ using UnityEngine.SceneManagement;
 
 namespace UI
 {
-    public class LevelCompletedMenuController : MonoBehaviour
+    public class LevelCompletedMenuController : BasePopupController<LevelCompletedMenuModel>
     {
-        private const string kTable = "LevelCompleted";
+        protected override string kTable => "LevelCompleted";
         private const string kMainMenu = "MainMenu";
         private const string kNextLevel = "NextLevel";
         private const string kCongratulations = "Congratulations";
@@ -15,18 +15,16 @@ namespace UI
 
         [SerializeField] private LevelCompletedMenuView _view;
 
-        private LevelCompletedMenuModel _model;
-        private LocalizationManager _localizationManager;
         private LevelDataService _levelDataService;
 
-        public void Show()
+        public override void Show()
         {
-            _view.gameObject.SetActive(true);
+            _view.Show();
         }
 
-        public void Hide()
+        public override void Hide()
         {
-            _view.gameObject.SetActive(false);
+            _view.Hide();
         }
 
         private void Start()
@@ -36,17 +34,16 @@ namespace UI
 
         private void Init()
         {
-            _localizationManager = LocalizationManager.Instance;
             _levelDataService = LevelDataService.Instance;
 
-            BuildModel();
+            _model = BuildModel();
             _view.Init(_model);
 
             UnsubscribeFromInputs();
             SubscribeToInputs();
         }
 
-        private void BuildModel()
+        protected override LevelCompletedMenuModel BuildModel()
         {
             LevelCompletedMenuModel model = new LevelCompletedMenuModel();
 
@@ -54,16 +51,17 @@ namespace UI
             model.MainMenuText = _localizationManager.GetLocalizedString(kTable, kMainMenu);
             model.CongratulationsText = _localizationManager.GetLocalizedString(kTable, kCongratulations);
             model.IsLastLevel = _levelDataService.IsLastLevel;
-            _model = model;
+
+            return model;
         }
 
-        private void SubscribeToInputs()
+        protected override void SubscribeToInputs()
         {
             _view.OnNextLevelPressed += LoadNextLevel;
             _view.OnMainMenuPressed += LoadMainMenu;
         }
 
-        private void UnsubscribeFromInputs()
+        protected override void UnsubscribeFromInputs()
         {
             _view.OnNextLevelPressed -= LoadNextLevel;
             _view.OnMainMenuPressed -= LoadMainMenu;

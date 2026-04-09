@@ -1,24 +1,22 @@
 using UI;
 using UnityEngine;
 
-public class SettingsMenuController : MonoBehaviour
+public class SettingsMenuController : BasePopupController<SettingsMenuModel>
 {
-    private const string kTable = "MainMenu";
+    protected override string kTable => "MainMenu";
     private const string kBack = "Back";
 
     [SerializeField] private SettingsMenuView _view;
     [SerializeField] private MainMenuController _mainMenu;
-    private SettingsMenuModel _model;
-    private LocalizationManager _localizationManager;
 
-    public void Show()
+    public override void Show()
     {
-        _view.gameObject.SetActive(true);
+        _view.Show();
     }
 
-    public void Hide()
+    public override void Hide()
     {
-        _view.gameObject.SetActive(false);
+        _view.Hide();
     }
 
     private void Start()
@@ -28,29 +26,27 @@ public class SettingsMenuController : MonoBehaviour
 
     private void Init()
     {
-        _localizationManager = LocalizationManager.Instance;
-
-        BuildModel();
+        _model = BuildModel();
         _view.Init(_model);
 
         UnsubscribeFromInputs();
         SubscribeToInputs();
     }
 
-    private void BuildModel()
+    protected override SettingsMenuModel BuildModel()
     {
         SettingsMenuModel model = new SettingsMenuModel();
 
         model.BackText = _localizationManager.GetLocalizedString(kTable, kBack);
-        _model = model;
+        return model;
     }
 
-    private void SubscribeToInputs()
+    protected override void SubscribeToInputs()
     {
         _view.OnBackPressed += OnBackClicked;
     }
 
-    private void UnsubscribeFromInputs()
+    protected override void UnsubscribeFromInputs()
     {
         _view.OnBackPressed -= OnBackClicked;
     }

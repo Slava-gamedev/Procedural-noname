@@ -3,28 +3,26 @@ using UnityEngine.SceneManagement;
 
 namespace UI
 {
-    public class MainMenuController : MonoBehaviour
+    public class MainMenuController : BasePopupController<MainMenuModel>
     {
-        private const string kTable = "MainMenu";
+        protected override string kTable => "MainMenu";
         private const string kPlay = "Play";
         private const string kSettings = "Settings";
         private const string kExit = "Exit";
 
         [SerializeField] private MainMenuView _view;
         [SerializeField] private SettingsMenuController _settingsMenu;
-        private MainMenuModel _model;
-        private LocalizationManager _localizationManager;
         private LevelDataService _levelDataService;
         private const string kLevelSceneFormat = "Level_{0}";
 
-        public void Show()
+        public override void Show()
         {
-            _view.gameObject.SetActive(true);
+            _view.Show();
         }
 
-        public void Hide()
+        public override void Hide()
         {
-            _view.gameObject.SetActive(false);
+            _view.Hide();
         }
 
         private void Start()
@@ -34,34 +32,34 @@ namespace UI
 
         private void Init()
         {
-            _localizationManager = LocalizationManager.Instance;
             _levelDataService = LevelDataService.Instance;
 
-            BuildModel();
+            _model = BuildModel();
             _view.Init(_model);
 
             UnsubscribeFromInputs();
             SubscribeToInputs();
         }
 
-        private void BuildModel()
+        protected override MainMenuModel BuildModel()
         {
             MainMenuModel model = new MainMenuModel();
 
             model.PlayText = _localizationManager.GetLocalizedString(kTable, kPlay);
             model.SettingsText = _localizationManager.GetLocalizedString(kTable, kSettings);
             model.ExitText = _localizationManager.GetLocalizedString(kTable, kExit);
-            _model = model;
+
+            return model;
         }
 
-        private void SubscribeToInputs()
+        protected override void SubscribeToInputs()
         {
             _view.OnPlayPressed += OnPlayClicked;
             _view.OnSettingsPressed += OnSettingsClicked;
             _view.OnExitPressed += OnExitClick;
         }
 
-        private void UnsubscribeFromInputs()
+        protected override void UnsubscribeFromInputs()
         {
             _view.OnPlayPressed -= OnPlayClicked;
             _view.OnSettingsPressed -= OnSettingsClicked;

@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class LevelCompletedMenuView : MonoBehaviour
+    public class LevelCompletedMenuView : BasePopupView
     {
         public event Action OnNextLevelPressed;
         public event Action OnMainMenuPressed;
@@ -29,13 +29,13 @@ namespace UI
             SubscribeButtons();
         }
 
-        private void SubscribeButtons()
+        protected override void SubscribeButtons()
         {
             _nextLevelButton.onClick.AddListener(OnNextLevelButtonPressed);
             _mainMenuButton.onClick.AddListener(OnMainMenuButtonPressed);
         }
 
-        private void UnsubscribeButtons()
+        protected override void UnsubscribeButtons()
         {
             _nextLevelButton.onClick.RemoveListener(OnNextLevelButtonPressed);
             _mainMenuButton.onClick.RemoveListener(OnMainMenuButtonPressed);

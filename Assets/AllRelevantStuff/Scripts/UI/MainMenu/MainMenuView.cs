@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class MainMenuView : MonoBehaviour
+    public class MainMenuView : BasePopupView
     {
         public event Action OnPlayPressed;
         public event Action OnSettingsPressed;
@@ -28,14 +28,14 @@ namespace UI
             SubscribeButtons();
         }
 
-        private void SubscribeButtons()
+        protected override void SubscribeButtons()
         {
             _playButton.onClick.AddListener(OnPlayButtonPressed);
             _settingsButton.onClick.AddListener(OnSettingsButtonPressed);
             _exitButton.onClick.AddListener(OnExitButtonPressed);
         }
 
-        private void UnsubscribeButtons()
+        protected override void UnsubscribeButtons()
         {
             _playButton.onClick.RemoveListener(OnPlayButtonPressed);
             _settingsButton.onClick.RemoveListener(OnSettingsButtonPressed);

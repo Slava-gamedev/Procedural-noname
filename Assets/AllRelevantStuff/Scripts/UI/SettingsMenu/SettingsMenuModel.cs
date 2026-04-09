@@ -1,6 +1,6 @@
 namespace UI
 {
-    public class SettingsMenuModel
+    public class SettingsMenuModel : IPopupModel
     {
         public string BackText;
     }

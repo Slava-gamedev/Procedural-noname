@@ -5,9 +5,8 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class SettingsMenuView : MonoBehaviour
+    public class SettingsMenuView : BasePopupView
     {
-
         public event Action OnBackPressed;
 
         [SerializeField] private Button _backButton;
@@ -20,12 +19,12 @@ namespace UI
             SubscribeButtons();
         }
 
-        private void SubscribeButtons()
+        protected override void SubscribeButtons()
         {
             _backButton.onClick.AddListener(OnBackButtonPressed);
         }
 
-        private void UnsubscribeButtons()
+        protected override void UnsubscribeButtons()
         {
             _backButton.onClick.RemoveListener(OnBackButtonPressed);
         }
