@@ -1,30 +1,14 @@
 using UnityEngine;
 
-public class LevelDataService
+public interface ILevelDataService
 {
-    private static LevelDataService _instance;
+    int CurrentLevel { get; }
+    bool IsLastLevel { get; }
+    void SetLevel(int level);
+}
 
-    private static readonly object _lock = new object();
-    public static LevelDataService Instance
-    {
-        get
-        {
-            lock (_lock)
-            {
-                if (_instance == null)
-                {
-                    _instance = new LevelDataService();
-                }
-                return _instance;
-            }
-        }
-    }
-
-    private LevelDataService()
-    {
-
-    }
-
+public class LevelDataService : ILevelDataService
+{
     public int CurrentLevel => _currentLevel;
     public bool IsLastLevel => _currentLevel == kAmountOfLevels;
 

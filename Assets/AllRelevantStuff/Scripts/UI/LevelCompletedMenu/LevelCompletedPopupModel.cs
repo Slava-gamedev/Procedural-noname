@@ -1,8 +1,6 @@
-using UnityEngine;
-
 namespace UI
 {
-    public class LevelCompletedMenuModel : IPopupModel
+    public class LevelCompletedPopupModel : IPopupModel
     {
         public string NextLevelText;
         public string MainMenuText;

@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using System;
 using UnityEngine;
 
 namespace UI
@@ -12,6 +13,7 @@ namespace UI
 
     public interface IPopupMediator
     {
+        event Action OnClosedPopup;
         void CreatePopup();
         void ClosePopup();
     }
@@ -24,6 +26,7 @@ namespace UI
         protected readonly IAddressablePopupProvider _popupProvider;
         protected TView _view;
 
+        public event Action OnClosedPopup;
 
         protected BasePopupMediator(PopupMediatorDependenices dependenices)
         {
@@ -50,6 +53,7 @@ namespace UI
         public void ClosePopup()
         {
             _UIManager.ClosePopup(this);
+            OnClosedPopup?.Invoke();
         }
 
         public virtual void Show()
@@ -64,6 +68,7 @@ namespace UI
 
         public virtual void Release()
         {
+            OnClosedPopup -= ClosePopup;
             _view.Release();
         }
     }

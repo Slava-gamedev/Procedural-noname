@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_GroupName: Default Local Group
   m_GUID: 6aa0e9e5b68b17c49960fa45c79e6767
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: cc7d5d38d7809ab4396d18bb2b786538
+    m_Address: Assets/AllRelevantStuff/Prefabs/CompletedLevelPopup.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: a048017d588361d498026a3b530ccc93, type: 2}
   m_SchemaSet:

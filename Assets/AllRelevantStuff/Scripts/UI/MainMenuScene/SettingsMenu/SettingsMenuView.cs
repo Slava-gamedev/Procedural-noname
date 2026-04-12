@@ -5,26 +5,41 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class SettingsMenuView : BasePopupView
+    public class SettingsMenuView : MonoBehaviour
     {
         public event Action OnBackPressed;
 
         [SerializeField] private Button _backButton;
         [SerializeField] private TMP_Text _backText;
 
-        public void Init(SettingsMenuModel model)
+        public void Init(string backText)
         {
-            _backText.text = model.BackText;
+            _backText.text = backText;
             UnsubscribeButtons();
             SubscribeButtons();
         }
 
-        protected override void SubscribeButtons()
+        public void Show()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Release()
+        {
+            UnsubscribeButtons();
+        }
+
+        protected void SubscribeButtons()
         {
             _backButton.onClick.AddListener(OnBackButtonPressed);
         }
 
-        protected override void UnsubscribeButtons()
+        protected void UnsubscribeButtons()
         {
             _backButton.onClick.RemoveListener(OnBackButtonPressed);
         }

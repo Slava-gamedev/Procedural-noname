@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class LevelCompletedMenuView : BasePopupView
+    public class LevelCompletedPopupView : BasePopupView
     {
         public event Action OnNextLevelPressed;
         public event Action OnMainMenuPressed;
@@ -16,7 +16,7 @@ namespace UI
         [SerializeField] private TMP_Text _mainMenuText;
         [SerializeField] private TMP_Text _congratulationsText;
 
-        public void Init(LevelCompletedMenuModel model)
+        public void Init(LevelCompletedPopupModel model)
         {
             _nextLevelText.text = model.NextLevelText;
             _mainMenuText.text = model.MainMenuText;

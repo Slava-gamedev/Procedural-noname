@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputReader
+public static class InputReader
 {
     private static PlayerControlInput _actions;
 

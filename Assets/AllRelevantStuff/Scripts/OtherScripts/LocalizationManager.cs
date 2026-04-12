@@ -5,31 +5,17 @@ using UnityEngine;
 using UnityEngine.Localization;
 using UnityEngine.Localization.Settings;
 
-public class LocalizationManager
+public interface ILocalizationManager
 {
-    private static LocalizationManager _instance;
+    event Action OnLanguageChanged;
+    string Language { get; }
+    string GetLocalizedString(string tableName, string entryKey);
+    UniTask<string> GetLocalizedStringAsync(string tableName, string entryKey);
+    void SetLanguage(string localeCode);
+}
 
-    private static readonly object _lock = new object();
-    public static LocalizationManager Instance
-    {
-        get
-        {
-            lock (_lock)
-            {
-                if (_instance == null)
-                {
-                    _instance = new LocalizationManager();
-                }
-                return _instance;
-            }
-        }
-    }
-
-    private LocalizationManager()
-    {
-        
-    }
-
+public class LocalizationManager : ILocalizationManager
+{
     public event Action OnLanguageChanged;
 
     public string Language => LocalizationSettings.SelectedLocale.Identifier.Code;

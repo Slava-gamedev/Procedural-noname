@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 namespace UI
 {
-    public class MainMenuView : BasePopupView
+    public class MainMenuView : MonoBehaviour
     {
         public event Action OnPlayPressed;
         public event Action OnSettingsPressed;
@@ -18,24 +18,39 @@ namespace UI
         [SerializeField] private TMP_Text _settingsText;
         [SerializeField] private TMP_Text _exitText;
 
-        public void Init(MainMenuModel model)
+        public void Init(string playText, string settingsText, string exitText)
         {
-            _playText.text = model.PlayText;
-            _settingsText.text = model.SettingsText;
-            _exitText.text = model.ExitText;
+            _playText.text = playText;
+            _settingsText.text = settingsText;
+            _exitText.text = exitText;
 
             UnsubscribeButtons();
             SubscribeButtons();
         }
 
-        protected override void SubscribeButtons()
+        public void Show()
+        {
+            gameObject.SetActive(true);
+        }
+
+        public void Hide()
+        {
+            gameObject.SetActive(false);
+        }
+
+        public void Release()
+        {
+            UnsubscribeButtons();
+        }
+
+        protected void SubscribeButtons()
         {
             _playButton.onClick.AddListener(OnPlayButtonPressed);
             _settingsButton.onClick.AddListener(OnSettingsButtonPressed);
             _exitButton.onClick.AddListener(OnExitButtonPressed);
         }
 
-        protected override void UnsubscribeButtons()
+        protected void UnsubscribeButtons()
         {
             _playButton.onClick.RemoveListener(OnPlayButtonPressed);
             _settingsButton.onClick.RemoveListener(OnSettingsButtonPressed);
