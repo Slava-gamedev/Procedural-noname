@@ -5,11 +5,14 @@ using Zenject;
 public class Starter : MonoBehaviour
 {
     private MainMenuSceneMediator _mainMenuScene;
+    private SendToSceneEventListener _sceneEventListener;
 
     [Inject]
-    private void Construct(MainMenuSceneMediator mainMenuScene)
+    private void Construct(MainMenuSceneMediator mainMenuScene,
+        SendToSceneEventListener sendToSceneEventListener)
     {
         _mainMenuScene = mainMenuScene;
+        _sceneEventListener = sendToSceneEventListener;
     }
 
     private void Start()
@@ -22,5 +25,6 @@ public class Starter : MonoBehaviour
         Application.targetFrameRate = 60;
 
         await _mainMenuScene.ShowSceneAdditive();
+        _sceneEventListener.Init();
     }
 }

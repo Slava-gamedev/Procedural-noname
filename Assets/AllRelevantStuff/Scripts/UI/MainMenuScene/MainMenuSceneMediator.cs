@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -14,14 +15,14 @@ public class MainMenuSceneMediator : BaseSceneMediator<MainMenuSceneView>
 
     private readonly ILevelDataService _levelDataService;
     private readonly ILocalizationManager _localizationManager;
-    private readonly LevelSceneMediator _levelMediator;
+    private readonly IEventBus _eventBus;
 
     public MainMenuSceneMediator(SceneMediatorDependenices dependenices, ILevelDataService levelDataService,
-        LevelSceneMediator levelMediator) : base(dependenices)
+        IEventBus eventBus) : base(dependenices)
     {
         _levelDataService = levelDataService;
         _localizationManager = dependenices.LocalizationManager;
-        _levelMediator = levelMediator;
+        _eventBus = eventBus;
     }
 
     protected override async UniTask DoOnInit()
@@ -78,7 +79,9 @@ public class MainMenuSceneMediator : BaseSceneMediator<MainMenuSceneView>
         _levelDataService.SetLevel(1);
 
         await _sceneManager.ReleaseScene(this);
-        await _levelMediator.ShowSceneAdditive();
+
+        SendToLevelEventArgs args = new SendToLevelEventArgs();
+        _eventBus.InvokeEvent<SendToLevelEventArgs>(args);
     }
 
     private void OnExitClicked()

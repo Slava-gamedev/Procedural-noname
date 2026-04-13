@@ -16,6 +16,7 @@ public class LevelSceneMediator : BaseSceneMediator<LevelSceneView>, ILevelScene
     public LevelSceneMediator(SceneMediatorDependenices dependenices, LevelSceneController levelSceneController) : base(dependenices)
     {
         _levelSceneController = levelSceneController;
+        _levelDataService = dependenices.LevelDataService;
     }
 
     protected override UniTask DoOnInit()

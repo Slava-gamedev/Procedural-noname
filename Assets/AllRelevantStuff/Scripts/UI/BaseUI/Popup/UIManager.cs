@@ -52,7 +52,7 @@ namespace UI
         private Transform _popupHolder;
         private Camera _camera;
         private int _sortingOrder = 0;
-        private List<IPopupContext> _popups;
+        private List<IPopupContext> _popups = new List<IPopupContext>();
 
         public void OpenPopup(IPopupContext popup)
         {

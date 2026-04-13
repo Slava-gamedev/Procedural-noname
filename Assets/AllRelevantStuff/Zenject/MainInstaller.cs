@@ -8,6 +8,7 @@ public class MainInstaller : MonoInstaller
     public override void InstallBindings()
     {
         BindServicesAndManagers();
+        BindListeners();
         BindProviders();
         BindUIDependencies();
         BindUI();
@@ -15,11 +16,18 @@ public class MainInstaller : MonoInstaller
 
     private void BindServicesAndManagers()
     {
+        Container.Bind<IEventBus>().To<EventBus>().AsSingle();
         Container.Bind<ISceneUIManager>().To<SceneUIManager>().AsSingle();
         Container.Bind<ISceneService>().To<SceneService>().AsSingle();
         Container.Bind<IUIManager>().To<UIManager>().AsSingle();
         Container.Bind<ILocalizationManager>().To<LocalizationManager>().AsSingle();
         Container.Bind<ILevelDataService>().To<LevelDataService>().AsSingle();
+    }
+
+    private void BindListeners()
+    {
+        Container.Bind<SendToSceneEventListener>().To<SendToSceneEventListener>().AsSingle();
+
     }
 
     private void BindProviders()

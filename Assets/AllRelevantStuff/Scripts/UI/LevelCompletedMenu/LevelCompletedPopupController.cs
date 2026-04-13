@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine.SceneManagement;
 
 namespace UI
@@ -11,17 +12,14 @@ namespace UI
         private const string kCongratulations = "Congratulations";
 
         private readonly ILevelDataService _levelDataService;
-        private readonly MainMenuSceneMediator _mainMenuSceneMediator;
-        private readonly LevelSceneMediator _levelSceneMediator;
+        private readonly IEventBus _eventBus;
 
         public LevelCompletedPopupController(PopupControllerDependenices dependenices,
             ILevelDataService levelDataService,
-            MainMenuSceneMediator mainMenuSceneMediator,
-            LevelSceneMediator levelSceneMediator) : base(dependenices)
+            IEventBus eventBus) : base(dependenices)
         {
             _levelDataService = levelDataService;
-            _mainMenuSceneMediator = mainMenuSceneMediator;
-            _levelSceneMediator = levelSceneMediator;
+            _eventBus = eventBus;
         }
 
         public override void Show()
@@ -72,13 +70,17 @@ namespace UI
             _levelDataService.SetLevel(nextLevelNumber);
 
             _mediator.ClosePopup();
-            await _levelSceneMediator.ShowSceneAdditive();
+
+            SendToLevelEventArgs args = new SendToLevelEventArgs();
+            _eventBus.InvokeEvent<SendToLevelEventArgs>(args);
         }
 
         private async void LoadMainMenu()
         {
             _mediator.ClosePopup();
-            await _mainMenuSceneMediator.ShowSceneAdditive();
+
+            SendToMainMenuEventArgs args = new SendToMainMenuEventArgs();
+            _eventBus.InvokeEvent<SendToMainMenuEventArgs>(args);
         }
     }
 }
