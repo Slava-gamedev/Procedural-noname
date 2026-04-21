@@ -15,6 +15,12 @@ MonoBehaviour:
   m_GroupName: Localization-String-Tables-Ukrainian (uk)
   m_GUID: 0b0667443c72ba1468313ca5434a5dbc
   m_SerializeEntries:
+  - m_GUID: 2a4a3034f9ecab24f8e0c5966997cede
+    m_Address: LevelPause_uk
+    m_ReadOnly: 1
+    m_SerializedLabels:
+    - Locale-uk
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 6dacdb1bdacb0fe4a8163cef988f9e57
     m_Address: LevelCompleted_uk
     m_ReadOnly: 1

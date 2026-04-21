@@ -13,7 +13,6 @@ public static class InputReader
             {
                 _actions = new PlayerControlInput();
                 LoadOverrides();
-                _actions.InGame.Enable();
             }
             return _actions;
         }

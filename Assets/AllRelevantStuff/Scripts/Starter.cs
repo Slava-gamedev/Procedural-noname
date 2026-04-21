@@ -24,7 +24,7 @@ public class Starter : MonoBehaviour
     {
         Application.targetFrameRate = 60;
 
-        await _mainMenuScene.ShowSceneAdditive();
+        await _mainMenuScene.ShowSceneSingle();
         _sceneEventListener.Init();
     }
 }

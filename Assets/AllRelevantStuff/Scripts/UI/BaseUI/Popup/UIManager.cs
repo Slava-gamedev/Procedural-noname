@@ -39,7 +39,7 @@ namespace UI
                     _popupHolder = go?.transform;
                 }
 
-                if (_popupHolder)
+                if (_popupHolder == null)
                 {
                     var go = new GameObject(kGameObjectName);
                     _popupHolder = go.transform;

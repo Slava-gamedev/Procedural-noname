@@ -1,0 +1,36 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: LevelPause Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: LevelPause
+  m_TableCollectionNameGuidString: 3a96255ccd0cfee48a2e7d0ef104f4b8
+  m_Entries:
+  - m_Id: 31022788608
+    m_Key: MainMenu
+    m_Metadata:
+      m_Items: []
+  - m_Id: 35443585024
+    m_Key: CloseMenu
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 3308637688479875146
+  references:
+    version: 2
+    RefIds:
+    - rid: 3308637688479875146
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1776801141035

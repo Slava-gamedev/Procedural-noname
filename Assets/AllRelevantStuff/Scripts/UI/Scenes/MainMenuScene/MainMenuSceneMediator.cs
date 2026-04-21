@@ -42,8 +42,6 @@ public class MainMenuSceneMediator : BaseSceneMediator<MainMenuSceneView>
     {
         UnsubscribeInputs();
         _view.Release();
-
-        base.DoOnRelease();
     }
 
     private void SubscribeInputs()
@@ -78,7 +76,7 @@ public class MainMenuSceneMediator : BaseSceneMediator<MainMenuSceneView>
     {
         _levelDataService.SetLevel(1);
 
-        await _sceneManager.ReleaseScene(this);
+        Release();
 
         SendToLevelEventArgs args = new SendToLevelEventArgs();
         _eventBus.InvokeEvent<SendToLevelEventArgs>(args);

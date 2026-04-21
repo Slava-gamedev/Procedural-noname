@@ -38,14 +38,6 @@ namespace CharacterMovement
             }
         }
 
-        private void Update()
-        {
-            if (Input.GetKeyDown(KeyCode.Space) && !_jumpInProgress)
-            {
-                StartJump().Forget();
-            }
-        }
-
         private async UniTask StartJump()
         {
             _jumpInProgress = true;

@@ -43,6 +43,8 @@ public class MainInstaller : MonoInstaller
         Container.Bind<LevelCompletedPopupMediator>().To<LevelCompletedPopupMediator>().AsTransient();
         Container.Bind<LevelCompletedPopupController>().To<LevelCompletedPopupController>().AsTransient();
 
+        Container.Bind<LevelPausePopupMediator>().To<LevelPausePopupMediator>().AsTransient();
+        Container.Bind<LevelPausePopupController>().To<LevelPausePopupController>().AsTransient();
     }
 
     private void BindUIDependencies()

@@ -21,3 +21,11 @@ MonoBehaviour:
         m_SubObjectType: 
         m_SubObjectGUID: 
         m_EditorAssetChanged: 0
+  - <Type>k__BackingField: 2
+    <Loader>k__BackingField:
+      _reference:
+        m_AssetGUID: 80e5a8b0250ae2440830cbbb53eade2b
+        m_SubObjectName: 
+        m_SubObjectType: 
+        m_SubObjectGUID: 
+        m_EditorAssetChanged: 0

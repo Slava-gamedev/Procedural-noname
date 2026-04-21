@@ -1,11 +1,14 @@
 using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UI;
+using UnityEditor;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public interface ISceneUIManager
 {
     UniTask ShowSceneAdditive(ISceneMediator mediator);
+    UniTask ShowSceneSingle(ISceneMediator mediator);
     UniTask ReleaseScene(ISceneMediator mediator);
 }
 
@@ -35,26 +38,16 @@ public class SceneUIManager : ISceneUIManager
 
     private Camera _camera;
 
+    public async UniTask ShowSceneSingle(ISceneMediator mediator)
+    {
+        LoadSceneMode loadSceneMode = LoadSceneMode.Single;
+        await ShowScene(mediator, loadSceneMode);
+    }
 
     public async UniTask ShowSceneAdditive(ISceneMediator mediator)
     {
-        if (_isSceneLoading)
-        {
-            await UniTask.WaitWhile(() => _isSceneLoading);
-        }
-
-        _isSceneLoading = true;
-        if (!_mediators.Contains(mediator))
-        {
-            _mediators.Add(_activeSceneMediator);
-            _sortingOrder += kSortingOrderStep;
-            await mediator.Init(Camera, _sortingOrder);
-        }
-
-        _activeSceneMediator = mediator;
-        mediator.Show();
-
-        _isSceneLoading = false;
+        LoadSceneMode loadSceneMode = LoadSceneMode.Additive;
+        await ShowScene(mediator, loadSceneMode);
     }
 
     public async UniTask ReleaseScene(ISceneMediator mediator)
@@ -90,6 +83,34 @@ public class SceneUIManager : ISceneUIManager
                 mediator.Release();
             }
         }
+    }
+
+    private async UniTask ShowScene(ISceneMediator mediator, LoadSceneMode loadSceneMode)
+    {
+        if (_isSceneLoading)
+        {
+            await UniTask.WaitWhile(() => _isSceneLoading);
+        }
+
+        if (loadSceneMode == LoadSceneMode.Single)
+        {
+            _sortingOrder = kDefaultSortingOrder;
+            _mediators.Clear();
+        }
+
+        _isSceneLoading = true;
+
+        if (!_mediators.Contains(mediator))
+        {
+            _mediators.Add(mediator);
+            _sortingOrder += kSortingOrderStep;
+            await mediator.Init(Camera, _sortingOrder, loadSceneMode);
+        }
+
+        _activeSceneMediator = mediator;
+        mediator.Show();
+
+        _isSceneLoading = false;
     }
 
     private void UpdateViewOrder()

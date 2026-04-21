@@ -1,12 +1,14 @@
 using Cysharp.Threading.Tasks;
 using UI;
+using UnityEngine.SceneManagement;
 
 
 public interface ISceneMediator : IView
 {
-    UniTask Init(UnityEngine.Camera camera, int sortingOrder);
+    UniTask Init(UnityEngine.Camera camera, int sortingOrder, LoadSceneMode sceneMode);
     void ChangeCanvasSorting(int sorting);
     UniTask ShowSceneAdditive();
+    UniTask ShowSceneSingle();
     UniTask UnloadScene();
 }
 
@@ -25,6 +27,11 @@ public abstract class BaseSceneMediator<TSceneView> : ISceneMediator where TScen
         _sceneManager = dependenices.SceneManager;
     }
 
+    public async UniTask ShowSceneSingle()
+    {
+        await _sceneManager.ShowSceneSingle(this);
+    }
+
     public async UniTask ShowSceneAdditive()
     {
         await _sceneManager.ShowSceneAdditive(this);
@@ -35,10 +42,10 @@ public abstract class BaseSceneMediator<TSceneView> : ISceneMediator where TScen
         await _sceneManager.ReleaseScene(this);
     }
 
-    public async UniTask Init(UnityEngine.Camera camera, int sortingOrder)
+    public async UniTask Init(UnityEngine.Camera camera, int sortingOrder, LoadSceneMode sceneMode)
     {
         string sceneKey = GetSceneKey();
-        var view = await _sceneService.LoadSceneAsync(sceneKey, UnityEngine.SceneManagement.LoadSceneMode.Additive);
+        var view = await _sceneService.LoadSceneAsync(sceneKey, sceneMode);
         view.Init(camera, sortingOrder);
         _view = (TSceneView)view;
         await DoOnInit();

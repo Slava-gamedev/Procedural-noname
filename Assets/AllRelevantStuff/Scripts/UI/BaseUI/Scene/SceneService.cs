@@ -11,20 +11,25 @@ public interface ISceneService
 
 public class SceneService : ISceneService
 {
-    private readonly HashSet<string> _cache = new();
+    private readonly HashSet<string> _loadedScenes = new();
 
     public async UniTask<ISceneView> LoadSceneAsync(string sceneKey, LoadSceneMode mode)
     {
         ISceneView sceneView = null;
 
-        if (!_cache.Contains(sceneKey))
+        if(mode == LoadSceneMode.Single)
+        {
+            _loadedScenes.Clear();
+        }
+
+        if (!_loadedScenes.Contains(sceneKey))
         {
 
             await SceneManager.LoadSceneAsync(sceneKey, mode);
 
 
             UnityEngine.Debug.LogFormat("Scene {0} loaded", sceneKey);
-            _cache.Add(sceneKey);
+            _loadedScenes.Add(sceneKey);
         }
 
         Scene instance = SceneManager.GetSceneByName(sceneKey);
@@ -36,10 +41,18 @@ public class SceneService : ISceneService
 
     public async UniTask UnloadSceneAsync(string sceneKey)
     {
-        if (_cache.TryGetValue(sceneKey, out string sceneName))
+        if (!_loadedScenes.TryGetValue(sceneKey, out string sceneName))
         {
-            _cache.Remove(sceneKey);
-            await SceneManager.UnloadSceneAsync(sceneKey);
+            return;
         }
+
+        Scene scene = SceneManager.GetSceneByName(sceneName);
+
+        if (scene.isLoaded && _loadedScenes.Count > 1)
+        {
+            await SceneManager.UnloadSceneAsync(sceneName);
+        }
+
+        _loadedScenes.Remove(sceneKey);
     }
 }

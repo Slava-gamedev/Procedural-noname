@@ -25,13 +25,19 @@ public class SendToSceneEventListener
 
     private async void OnSendToMainMenu(SendToMainMenuEventArgs args)
     {
-        await _mainMenuSceneMediator.ShowSceneAdditive();
+        InputReader.Actions.UI.Disable();
+        InputReader.Actions.InGame.Disable();
+
+        await _mainMenuSceneMediator.ShowSceneSingle();
     }
 
     private async void OnSendToLevel(SendToLevelEventArgs args)
     {
+        InputReader.Actions.UI.Enable();
+        InputReader.Actions.InGame.Enable();
+
         LevelSceneMediator levelSceneMediator = _container.Resolve<LevelSceneMediator>();
 
-        await levelSceneMediator.ShowSceneAdditive();
+        await levelSceneMediator.ShowSceneSingle();
     }
 }

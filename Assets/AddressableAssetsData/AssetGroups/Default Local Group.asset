@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 6aa0e9e5b68b17c49960fa45c79e6767
   m_SerializeEntries:
+  - m_GUID: 80e5a8b0250ae2440830cbbb53eade2b
+    m_Address: Assets/AllRelevantStuff/Prefabs/PauseLevelPopup.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: cc7d5d38d7809ab4396d18bb2b786538
     m_Address: Assets/AllRelevantStuff/Prefabs/CompletedLevelPopup.prefab
     m_ReadOnly: 0
