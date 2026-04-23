@@ -10,6 +10,7 @@ namespace CharacterMovement
         [SerializeField] private float _maxObstacleThreshold = 0.91f;
         [SerializeField] private float _maxSlopeAngle = 60f;
         private float _maxRaycastDistance = 30f;
+        private float _minRaycastDistance = 0.1f;
 
         public Vector2 CheckGroundBelowPosition(Vector2 worldPosition)
         {
@@ -58,6 +59,9 @@ namespace CharacterMovement
             RaycastHit2D rightRaycast = Physics2D.Raycast(rightOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
             RaycastHit2D middleRaycast = Physics2D.Raycast(middleOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
 
+            int direction = facingDirection == FacingDirection.Right ? 1 : -1;
+            RaycastHit2D obsacleRaycast = Physics2D.CircleCast(origin, bodyRadius, Vector2.right * direction, _minRaycastDistance, _groundLayer);
+
             RaycastHit2D frontRaycast =  facingDirection == FacingDirection.Right ? rightRaycast : leftRaycast;
             RaycastHit2D backRaycast =  facingDirection == FacingDirection.Right ? leftRaycast : rightRaycast;
 
@@ -70,11 +74,13 @@ namespace CharacterMovement
             float expectedDifference = (bodyRadius * 2f) * Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
             float heightDifference = Mathf.Abs(frontRaycastDistance - backRaycastDistance);
             
+            bool isObstacleAhead = obsacleRaycast.collider != null;
+
             bool isSteepObstacle = (heightDifference - expectedDifference) > _minObstacleThreshold;
             bool isWithinMaxHeight = heightDifference <= _maxObstacleThreshold;
 
             bool isSlopeTooSteep = slopeAngle > _maxSlopeAngle;
-            bool isMovementBlocked = (!isWithinMaxHeight || isSlopeTooSteep) && (frontRaycastDistance < backRaycastDistance);
+            bool isMovementBlocked = (!isWithinMaxHeight || isSlopeTooSteep) && (isObstacleAhead);
 
             bool shouldAscend = isSteepObstacle && isWithinMaxHeight && frontRaycastDistance < backRaycastDistance;
             bool shouldDescend = isSteepObstacle && isWithinMaxHeight && frontRaycastDistance > backRaycastDistance;
