@@ -21,8 +21,8 @@ namespace CharacterMovement
         {
             if (_airMode)
             {
-                Vector2 leftLegTarget = _terrainAnalyzer.CheckAtPosition(_leftLeg.ThighPivotPosition);
-                Vector2 rightLegTarget = _terrainAnalyzer.CheckAtPosition(_rightLeg.ThighPivotPosition);
+                Vector2 leftLegTarget = _terrainAnalyzer.CheckGroundBelowPosition(_leftLeg.ThighPivotPosition);
+                Vector2 rightLegTarget = _terrainAnalyzer.CheckGroundBelowPosition(_rightLeg.ThighPivotPosition);
 
                 _leftLeg.StartPreparingForLanding(leftLegTarget, timeBeforeLanding);
                 _rightLeg.StartPreparingForLanding(rightLegTarget, timeBeforeLanding);
@@ -31,8 +31,8 @@ namespace CharacterMovement
 
         public void UpdateLandingPoints()
         {
-            Vector2 leftTarget = _terrainAnalyzer.CheckAtPosition(_leftLeg.ThighPivotPosition);
-            Vector2 rightTarget = _terrainAnalyzer.CheckAtPosition(_rightLeg.ThighPivotPosition);
+            Vector2 leftTarget = _terrainAnalyzer.CheckGroundBelowPosition(_leftLeg.ThighPivotPosition);
+            Vector2 rightTarget = _terrainAnalyzer.CheckGroundBelowPosition(_rightLeg.ThighPivotPosition);
 
             _leftLeg.UpdateLandingTarget(leftTarget);
             _rightLeg.UpdateLandingTarget(rightTarget);
@@ -113,13 +113,11 @@ namespace CharacterMovement
 
         private Vector2 CalculateStepTarget(LegIKController leg, float stepDuration)
         {
-            float direction = Mathf.Sign(_movementController.CurrentSignedSpeed);
+            int direction = (_movementController.CurrentSignedSpeed >= 0f) ? 1 : (-1);
             float stepLength = _movementController.CurrentAbsoluteSpeed * stepDuration;
 
             Vector2 pelvisPos = leg.ThighPivotPosition;
-            Vector2 target = pelvisPos + Vector2.right * direction * stepLength;
-            target = _terrainAnalyzer.CheckAtPosition(target);
-
+            Vector2 target = _terrainAnalyzer.GetStepTarget(pelvisPos, stepLength, direction);
             return target;
         }
 

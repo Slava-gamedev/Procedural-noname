@@ -10,11 +10,10 @@ namespace CharacterMovement
         [SerializeField] private float _maxObstacleThreshold = 0.91f;
         [SerializeField] private float _maxSlopeAngle = 60f;
         private float _maxRaycastDistance = 30f;
-        private float _upwardOffset = 3f;
 
-        public Vector2 CheckAtPosition(Vector2 worldPosition)
+        public Vector2 CheckGroundBelowPosition(Vector2 worldPosition)
         {
-            RaycastHit2D hit = Physics2D.CircleCast(worldPosition + Vector2.up * _upwardOffset,
+            RaycastHit2D hit = Physics2D.CircleCast(worldPosition,
                 _footWidth / 2, Vector2.down, _maxRaycastDistance, _groundLayer);
 
             if (hit.collider != null)
@@ -23,6 +22,30 @@ namespace CharacterMovement
             }
 
             return worldPosition;
+        }
+
+        public Vector2 GetStepTarget(Vector2 pelvisPosition, float stepLength, int directionX)
+        {
+            Vector2 currentGroundPosition = CheckGroundBelowPosition(pelvisPosition);
+            Vector2 raycastOrigin = currentGroundPosition + new Vector2(0, _maxObstacleThreshold);
+            Vector2 secondRaycastOrigin;
+            Vector2 result;
+
+            RaycastHit2D raycastHit = Physics2D.Raycast(raycastOrigin, new Vector2(directionX,0), stepLength + _footWidth / 2, _groundLayer);
+
+            if (raycastHit.collider != null)
+            {
+                float originX = raycastHit.point.x - directionX * _footWidth;
+                secondRaycastOrigin = new Vector2(originX, raycastHit.point.y);
+
+                result = CheckGroundBelowPosition(secondRaycastOrigin);
+                return result;
+            }
+
+            secondRaycastOrigin = raycastOrigin + new Vector2(directionX, 0) * stepLength;
+
+            result = CheckGroundBelowPosition(secondRaycastOrigin);
+            return result;
         }
 
         public TerrainReport CheckTerrain(Vector2 origin, float bodyRadius, FacingDirection facingDirection)
