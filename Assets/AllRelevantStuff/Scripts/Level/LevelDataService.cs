@@ -13,7 +13,7 @@ public class LevelDataService : ILevelDataService
     public bool IsLastLevel => _currentLevel == kAmountOfLevels;
 
 
-    private const int kAmountOfLevels = 3;
+    private const int kAmountOfLevels = 4;
     private int _currentLevel;
 
     public void SetLevel(int level)

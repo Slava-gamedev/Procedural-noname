@@ -64,6 +64,10 @@ namespace CharacterMovement
                 _elapsedTime = 0f;
                 _startLocalOffset = (Vector2)_footTarget.position - (Vector2)_thighPivot.position;
             }
+            else
+            {
+                _footTarget.position = _targetStepPosition;
+            }
         }
 
         public void UpdateFacingDirection(FacingDirection facingDirection)
@@ -169,16 +173,10 @@ namespace CharacterMovement
             float b = _shinLength;
             float c = distance;
 
-            float angleToTarget =
-                Mathf.Atan2(toTarget.y, toTarget.x) * Mathf.Rad2Deg;
-
-            float cosThigh =
-                (a * a + c * c - b * b) / (2f * a * c);
-
+            float angleToTarget = Mathf.Atan2(toTarget.y, toTarget.x) * Mathf.Rad2Deg;
+            float cosThigh = (a * a + c * c - b * b) / (2f * a * c);
             cosThigh = Mathf.Clamp(cosThigh, -1f, 1f);
-
-            float offset =
-                Mathf.Acos(cosThigh) * Mathf.Rad2Deg;
+            float offset = Mathf.Acos(cosThigh) * Mathf.Rad2Deg;
 
             float thighAngle = angleToTarget + (offset * _angleDirectionModifier) + _boneForwardOffset;
 
@@ -195,8 +193,7 @@ namespace CharacterMovement
 
             cosKnee = Mathf.Clamp(cosKnee, -1f, 1f);
 
-            float kneeAngle =
-                Mathf.Acos(cosKnee) * Mathf.Rad2Deg;
+            float kneeAngle = Mathf.Acos(cosKnee) * Mathf.Rad2Deg;
 
             return (180f - kneeAngle) * (_angleDirectionModifier * -1f);
         }
@@ -210,6 +207,17 @@ namespace CharacterMovement
         {
             Vector2 vectorToTarget = CurrentFootPosition - (Vector2)_thighPivot.position;
             return vectorToTarget;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.color = Color.green;
+
+            Gizmos.DrawWireSphere(_targetStepPosition, 0.1f);
+
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(CurrentFootPosition, 0.1f);
+            Gizmos.DrawWireSphere(_startStepPosition, 0.1f);
         }
     }
 }

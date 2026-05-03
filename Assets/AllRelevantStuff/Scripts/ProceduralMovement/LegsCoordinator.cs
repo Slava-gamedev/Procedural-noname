@@ -17,30 +17,32 @@ namespace CharacterMovement
         private float _previousCycle;
         private bool _airMode;
 
-        public void StartLandingPreparation(float timeBeforeLanding)
+        public void StartLandingPreparation(Vector2 landingPoint, float timeBeforeLanding)
         {
             if (_airMode)
             {
-                Vector2 leftLegTarget = _terrainAnalyzer.CheckGroundBelowPosition(_leftLeg.ThighPivotPosition);
-                Vector2 rightLegTarget = _terrainAnalyzer.CheckGroundBelowPosition(_rightLeg.ThighPivotPosition);
+                Debug.Log($"landingPoint: {landingPoint}, timeBeforeLanding: {timeBeforeLanding}");
 
-                _leftLeg.StartPreparingForLanding(leftLegTarget, timeBeforeLanding);
-                _rightLeg.StartPreparingForLanding(rightLegTarget, timeBeforeLanding);
+                var landingTargets = CalculateLandingTargets(landingPoint);
+
+                _leftLeg.StartPreparingForLanding(landingTargets.leftTarget, timeBeforeLanding);
+                _rightLeg.StartPreparingForLanding(landingTargets.rightTarget, timeBeforeLanding);
             }
         }
 
-        public void UpdateLandingPoints()
+        public void UpdateLandingPoints(Vector2 landingPoint)
         {
-            Vector2 leftTarget = _terrainAnalyzer.CheckGroundBelowPosition(_leftLeg.ThighPivotPosition);
-            Vector2 rightTarget = _terrainAnalyzer.CheckGroundBelowPosition(_rightLeg.ThighPivotPosition);
+            var landingTargets = CalculateLandingTargets(landingPoint);
 
-            _leftLeg.UpdateLandingTarget(leftTarget);
-            _rightLeg.UpdateLandingTarget(rightTarget);
+            _leftLeg.UpdateLandingTarget(landingTargets.leftTarget);
+            _rightLeg.UpdateLandingTarget(landingTargets.rightTarget);
         }
 
 
         public void SetAirMode(bool airMode)
         {
+            Debug.Log($"airMode: {airMode}");
+
             _airMode = airMode;
             _rightLeg.SetInAir(_airMode);
             _leftLeg.SetInAir(_airMode);
@@ -178,6 +180,17 @@ namespace CharacterMovement
         {
             TryStepIgnoringCycle(_rightLeg, _leftLeg);
             TryStepIgnoringCycle(_leftLeg, _rightLeg);
+        }
+
+        private (Vector2 leftTarget, Vector2 rightTarget) CalculateLandingTargets(Vector2 landingPoint)
+        {
+            Vector2 origin = transform.position;
+
+            float leftLegOffset = (_leftLeg.ThighPivotPosition - origin).x;
+            Vector2 leftTarget = landingPoint + new Vector2(leftLegOffset, 0);
+            Vector2 rightTarget = landingPoint + new Vector2(-leftLegOffset, 0);
+
+            return (leftTarget, rightTarget);
         }
     }
 }

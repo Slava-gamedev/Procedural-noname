@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace CharacterMovement
@@ -9,6 +10,9 @@ namespace CharacterMovement
         [SerializeField] private float _minObstacleThreshold = 0.1f;
         [SerializeField] private float _maxObstacleThreshold = 0.91f;
         [SerializeField] private float _maxSlopeAngle = 60f;
+        [SerializeField] private int _trajectorySteps = 30;
+        [SerializeField] private float _trajectoryTimeStep = 0.05f;
+
         private float _maxRaycastDistance = 30f;
         private float _minRaycastDistance = 0.1f;
 
@@ -32,7 +36,7 @@ namespace CharacterMovement
             Vector2 secondRaycastOrigin;
             Vector2 result;
 
-            RaycastHit2D raycastHit = Physics2D.Raycast(raycastOrigin, new Vector2(directionX,0), stepLength + _footWidth / 2, _groundLayer);
+            RaycastHit2D raycastHit = Physics2D.Raycast(raycastOrigin, new Vector2(directionX, 0), stepLength + _footWidth / 2, _groundLayer);
 
             if (raycastHit.collider != null)
             {
@@ -62,8 +66,8 @@ namespace CharacterMovement
             int direction = facingDirection == FacingDirection.Right ? 1 : -1;
             RaycastHit2D obsacleRaycast = Physics2D.CircleCast(origin, bodyRadius, Vector2.right * direction, _minRaycastDistance, _groundLayer);
 
-            RaycastHit2D frontRaycast =  facingDirection == FacingDirection.Right ? rightRaycast : leftRaycast;
-            RaycastHit2D backRaycast =  facingDirection == FacingDirection.Right ? leftRaycast : rightRaycast;
+            RaycastHit2D frontRaycast = facingDirection == FacingDirection.Right ? rightRaycast : leftRaycast;
+            RaycastHit2D backRaycast = facingDirection == FacingDirection.Right ? leftRaycast : rightRaycast;
 
             float frontRaycastDistance = frontRaycast.distance;
             float backRaycastDistance = backRaycast.distance;
@@ -73,7 +77,7 @@ namespace CharacterMovement
             float slopeAngle = Vector2.Angle(Vector2.up, averageNormal);
             float expectedDifference = (bodyRadius * 2f) * Mathf.Tan(slopeAngle * Mathf.Deg2Rad);
             float heightDifference = Mathf.Abs(frontRaycastDistance - backRaycastDistance);
-            
+
             bool isObstacleAhead = obsacleRaycast.collider != null;
 
             bool isSteepObstacle = (heightDifference - expectedDifference) > _minObstacleThreshold;
@@ -101,36 +105,59 @@ namespace CharacterMovement
         public JumpReport CheckJump(Vector2 origin, float standingHeight, float bodyRadius, Rigidbody2D rigidbody)
         {
             Vector2 middleOrigin = new Vector2(origin.x, origin.y - bodyRadius);
+            Vector2 trajectoryOrigin = new Vector2(origin.x, origin.y - bodyRadius - standingHeight);
             RaycastHit2D middleRaycast = Physics2D.Raycast(middleOrigin, Vector2.down, _maxRaycastDistance, _groundLayer);
 
             JumpReport jumpReport = new JumpReport();
-            if(middleRaycast.collider != null)
+            if (middleRaycast.collider != null)
             {
                 float currentDistance = middleRaycast.distance;
                 jumpReport.IsGrounded = currentDistance <= standingHeight;
 
-                float distanceBeforeLanding = currentDistance - standingHeight;
-
-                if(distanceBeforeLanding > 0)
+                if (!jumpReport.IsGrounded && TryCalculateLandingPoint(trajectoryOrigin, rigidbody, out Vector2 landingPoint, out float timeToLanding))
                 {
-                    jumpReport.TimeToLanding = CalculateTimeToLanding(distanceBeforeLanding, rigidbody);
+                    jumpReport.TimeToLanding = timeToLanding;
+                    jumpReport.LandingPoint = landingPoint;
                 }
 
-                jumpReport.ShouldPrepareForLanding = !jumpReport.IsGrounded;
+                jumpReport.ShouldPrepareForLanding = jumpReport.LandingPoint != Vector2.zero;
             }
 
             return jumpReport;
         }
 
-        private float CalculateTimeToLanding(float distanceBeforeLanding, Rigidbody2D rigidbody)
+        private bool TryCalculateLandingPoint(Vector2 origin, Rigidbody2D rigidbody, out Vector2 landingPoint, out float timeToLanding)
         {
-            float startingVelocity = Mathf.Abs(rigidbody.linearVelocityY);
-            float acceleration = Mathf.Abs(Physics2D.gravity.y * rigidbody.gravityScale);
+            float velocityY = rigidbody.linearVelocityY;
+            float velocityX = rigidbody.linearVelocityX;
+            float gravity = Physics2D.gravity.y * rigidbody.gravityScale;
 
-            float discriminant = startingVelocity * startingVelocity + 2f * acceleration * distanceBeforeLanding;
+            Vector2 previousPoint = origin;
 
-            float timeToLanding = (Mathf.Sqrt(discriminant) - startingVelocity) / acceleration;
-            return timeToLanding;
+            for (int i = 1; i <= _trajectorySteps; i++)
+            {
+                float timeInTrajectory = i * _trajectoryTimeStep;
+                float currentX = origin.x + velocityX * timeInTrajectory;
+                float currentY = origin.y + velocityY * timeInTrajectory + 0.5f * gravity * timeInTrajectory * timeInTrajectory;
+                Vector2 currentPoint = new Vector2(currentX, currentY);
+
+                Vector2 trajectorySegment = currentPoint - previousPoint;
+                RaycastHit2D raycast = Physics2D.Raycast(previousPoint, trajectorySegment.normalized, trajectorySegment.magnitude, _groundLayer);
+
+                if (raycast.collider != null)
+                {
+                    landingPoint = raycast.point;
+                    float segmentFraction = raycast.distance / trajectorySegment.magnitude;
+                    timeToLanding = ((i - 1) + segmentFraction) * _trajectoryTimeStep;
+                    return true;
+                }
+                previousPoint = currentPoint;
+            }
+
+            landingPoint = Vector2.zero;
+            timeToLanding = 0;
+
+            return false;
         }
     }
 
@@ -151,5 +178,6 @@ namespace CharacterMovement
         public bool IsGrounded;
         public bool ShouldPrepareForLanding;
         public float TimeToLanding;
+        public Vector2 LandingPoint;
     }
 }

@@ -108,21 +108,21 @@ namespace CharacterMovement
             if (_isPreparingForLanding == false)
             {
                 _isPreparingForLanding = true;
-                _legsCoordinator.StartLandingPreparation(report.TimeToLanding);
+                _legsCoordinator.StartLandingPreparation(report.LandingPoint,report.TimeToLanding);
             }
             else
             {
-                _legsCoordinator.UpdateLandingPoints();
+                _legsCoordinator.UpdateLandingPoints(report.LandingPoint);
             }
         }
 
         private void HandleLanding()
         {
+            Debug.Log("HandleLanding");
             _jumpInProgress = false;
             _isPreparingForLanding = false;
             _legsCoordinator.SetAirMode(_jumpInProgress);
             _bodyController.SetSpringActive(true);
-
         }
 
         private bool IsGrounded()
