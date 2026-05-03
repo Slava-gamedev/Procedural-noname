@@ -21,8 +21,6 @@ namespace CharacterMovement
         {
             if (_airMode)
             {
-                Debug.Log($"landingPoint: {landingPoint}, timeBeforeLanding: {timeBeforeLanding}");
-
                 var landingTargets = CalculateLandingTargets(landingPoint);
 
                 _leftLeg.StartPreparingForLanding(landingTargets.leftTarget, timeBeforeLanding);
@@ -41,8 +39,6 @@ namespace CharacterMovement
 
         public void SetAirMode(bool airMode)
         {
-            Debug.Log($"airMode: {airMode}");
-
             _airMode = airMode;
             _rightLeg.SetInAir(_airMode);
             _leftLeg.SetInAir(_airMode);
