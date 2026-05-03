@@ -119,11 +119,14 @@ namespace CharacterMovement
 
         private void PrepareForLandingUpdate()
         {
+            Vector2 targetOffset = new Vector2(_airPoseOffset.x * _angleDirectionModifier, _airPoseOffset.y);
+            Vector2 startPosition = (Vector2)_thighPivot.position + targetOffset;
+
             _elapsedTime += Time.deltaTime;
             float timeParameter = _elapsedTime / _landingPreparationDuration;
             float smoothT = Mathf.SmoothStep(0, 1, timeParameter);
 
-            _footTarget.position = Vector2.Lerp(_startStepPosition, _targetStepPosition, smoothT);
+            _footTarget.position = Vector2.Lerp(startPosition, _targetStepPosition, smoothT);
         }
 
         private void AirPoseUpdate()
