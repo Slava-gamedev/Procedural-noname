@@ -22,11 +22,13 @@ namespace CharacterMovement
 
         private void OnEnable()
         {
+            _bodyController.OnFall += FreeFall;
             InputReader.Actions.InGame.Jump.performed += HandleJumpPress;
         }
 
         private void OnDisable()
         {
+            _bodyController.OnFall -= FreeFall;
             InputReader.Actions.InGame.Jump.performed -= HandleJumpPress;
         }
 
@@ -50,6 +52,31 @@ namespace CharacterMovement
 
             await UniTask.WaitWhile(IsGrounded);
             _legsCoordinator.SetAirMode(_jumpInProgress);
+
+            await WaitUntilGrounded();
+
+            HandleLanding();
+        }
+
+        private async void FreeFall()
+        {
+            if(_jumpInProgress == true)
+            {
+                return;
+            }
+
+            JumpReport jumpReport = _terrainAnalyzer.CheckJump(transform.position, _bodyController.StandingHeight,
+                        _bodyController.BodyRadius, _rigidbody);
+
+            _jumpInProgress = true;
+
+            _bodyController.SetSpringActive(false);
+            _legsCoordinator.SetAirMode(_jumpInProgress, jumpReport.ShouldPrepareForLanding);
+
+            if (jumpReport.ShouldPrepareForLanding)
+            {
+                PrepareForLanding(jumpReport);
+            }
 
             await WaitUntilGrounded();
 

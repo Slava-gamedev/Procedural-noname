@@ -37,11 +37,11 @@ namespace CharacterMovement
         }
 
 
-        public void SetAirMode(bool airMode)
+        public void SetAirMode(bool airMode, bool prepareForLanding = false)
         {
             _airMode = airMode;
-            _rightLeg.SetInAir(_airMode);
-            _leftLeg.SetInAir(_airMode);
+            _rightLeg.SetInAir(_airMode, prepareForLanding);
+            _leftLeg.SetInAir(_airMode, prepareForLanding);
             if (!_airMode)
             {
                 RepositionLegs();

@@ -1,3 +1,4 @@
+using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 namespace CharacterMovement
@@ -10,8 +11,9 @@ namespace CharacterMovement
         [SerializeField] private Transform _shinPivot;
 
         [SerializeField] private float _stepHeight = 0.3f;
-        [SerializeField] private Vector2 _airPoseOffset;
+        [SerializeField] private Vector2 _tuckLegOffset;
         [SerializeField] private float _tuckTime;
+
 
         private float _currentStepDuration;
         private float _elapsedTime;
@@ -25,6 +27,7 @@ namespace CharacterMovement
         private bool _preparingForLanding = false;
         private Vector2 _startLocalOffset;
         private float _landingPreparationDuration;
+        private Vector2 _airPoseOffset;
 
         public float FullLegLength => _thighLength + _shinLength;
         public bool IsMoving { get; private set; }
@@ -43,7 +46,6 @@ namespace CharacterMovement
         {
             _preparingForLanding = true;
             _targetStepPosition = targetPosition;
-            _startStepPosition = CurrentFootPosition;
             _elapsedTime = 0f;
             _landingPreparationDuration = timeBeforeLanding;
         }
@@ -53,16 +55,17 @@ namespace CharacterMovement
             _targetStepPosition = landingTarget;
         }
 
-        public void SetInAir(bool inAir)
+        public void SetInAir(bool inAir, bool prepareForLanding = false)
         {
             _isInAir = inAir;
-            _preparingForLanding = false;
+            _preparingForLanding = prepareForLanding;
 
             if (inAir)
             {
                 IsMoving = false;
                 _elapsedTime = 0f;
-                _startLocalOffset = (Vector2)_footTarget.position - (Vector2)_thighPivot.position;
+                _startLocalOffset = CurrentFootPosition - ThighPivotPosition;
+                _airPoseOffset = !prepareForLanding ? _tuckLegOffset : _startLocalOffset;
             }
             else
             {
@@ -119,14 +122,14 @@ namespace CharacterMovement
 
         private void PrepareForLandingUpdate()
         {
-            Vector2 targetOffset = new Vector2(_airPoseOffset.x * _angleDirectionModifier, _airPoseOffset.y);
-            Vector2 startPosition = (Vector2)_thighPivot.position + targetOffset;
+            Vector2 targetOffset = _targetStepPosition - ThighPivotPosition;
 
             _elapsedTime += Time.deltaTime;
             float timeParameter = _elapsedTime / _landingPreparationDuration;
             float smoothT = Mathf.SmoothStep(0, 1, timeParameter);
+            Vector2 offset = Vector2.Lerp(_airPoseOffset, targetOffset, smoothT);
 
-            _footTarget.position = Vector2.Lerp(startPosition, _targetStepPosition, smoothT);
+            _footTarget.position = ThighPivotPosition + offset;
         }
 
         private void AirPoseUpdate()
@@ -138,7 +141,7 @@ namespace CharacterMovement
             float smoothT = Mathf.SmoothStep(0, 1, timeParameter);
             Vector2 offset = Vector2.Lerp(_startLocalOffset, targetOffset, smoothT);
 
-            _footTarget.position = (Vector2)_thighPivot.position + offset;
+            _footTarget.position = ThighPivotPosition + offset;
         }
 
         private void UpdateFootPosition()
@@ -220,6 +223,8 @@ namespace CharacterMovement
 
             Gizmos.color = Color.red;
             Gizmos.DrawWireSphere(CurrentFootPosition, 0.1f);
+
+            Gizmos.color = Color.yellow;
             Gizmos.DrawWireSphere(_startStepPosition, 0.1f);
         }
     }

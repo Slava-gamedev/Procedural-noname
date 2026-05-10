@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 namespace CharacterMovement
@@ -27,7 +28,7 @@ namespace CharacterMovement
 
         public float StandingHeight => _standingHeight;
         public float BodyRadius => _bodyRadius;
-
+        public event Action OnFall;
 
         public void SetSpringActive(bool isActive)
         {
@@ -50,8 +51,17 @@ namespace CharacterMovement
             TerrainReport report = _terrainAnalyzer.CheckTerrain(transform.position,
                 _bodyRadius, _movementController.FacingDirection);
 
-            if ((report.BodyDistance > _standingHeight && _cachedReport == null) || !_isSpringActive)
+            if (!_isSpringActive)
             {
+                return;
+            }
+            else if ((report.BodyDistance > _standingHeight && _cachedReport == null))
+            {
+                float difference = Mathf.Abs(report.BodyDistance - _standingHeight);
+                if (difference > 0.2f)
+                {
+                    OnFall?.Invoke();
+                }
                 return;
             }
 
