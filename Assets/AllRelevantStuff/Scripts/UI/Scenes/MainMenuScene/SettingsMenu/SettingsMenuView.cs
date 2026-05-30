@@ -11,8 +11,7 @@ namespace UI
 
         [SerializeField] private Button _backButton;
         [SerializeField] private TMP_Text _backText;
-        [SerializeField] private TMP_Text _rebindOverlayText;
-        [SerializeField] private GameObject _rebindOverlay;
+        [SerializeField] private RebindOverlayMapper _rebindOverlayMapper;
 
         public void Init(string backText)
         {
@@ -50,5 +49,12 @@ namespace UI
         {
             OnBackPressed?.Invoke();
         }
+    }
+
+    [Serializable]
+    public class RebindOverlayMapper
+    {
+        public TMP_Text RebindOverlayText;
+        public GameObject RebindOverlay;
     }
 }
