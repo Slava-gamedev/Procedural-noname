@@ -11,6 +11,8 @@ namespace UI
 
         [SerializeField] private Button _backButton;
         [SerializeField] private TMP_Text _backText;
+        [SerializeField] private TMP_Text _rebindOverlayText;
+        [SerializeField] private GameObject _rebindOverlay;
 
         public void Init(string backText)
         {
