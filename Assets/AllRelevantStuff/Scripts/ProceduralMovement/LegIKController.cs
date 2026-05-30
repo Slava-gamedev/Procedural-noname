@@ -1,4 +1,3 @@
-using UnityEditor.ShaderGraph.Internal;
 using UnityEngine;
 
 namespace CharacterMovement
@@ -220,12 +219,6 @@ namespace CharacterMovement
             Gizmos.color = Color.green;
 
             Gizmos.DrawWireSphere(_targetStepPosition, 0.1f);
-
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(CurrentFootPosition, 0.1f);
-
-            Gizmos.color = Color.yellow;
-            Gizmos.DrawWireSphere(_startStepPosition, 0.1f);
         }
     }
 }

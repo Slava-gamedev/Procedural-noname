@@ -68,11 +68,8 @@ namespace CharacterMovement
             _movementController.SetMovementBlocked(report.IsMovementBlocked);
 
             float currentDistanceToGround = report.BodyDistance;
-
             float terrainOffset = CalculateVerticalOffsetFromTerrain(report);
-
             float stepLengthOffset = CalculateVerticalOffsetFromStepLength();
-
             float heightCorrection = 0;
 
             if (_cachedReport != null)
