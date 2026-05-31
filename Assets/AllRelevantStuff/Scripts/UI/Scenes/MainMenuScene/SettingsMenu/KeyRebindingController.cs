@@ -4,7 +4,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.Utilities;
-using static UnityEngine.EventSystems.EventTrigger;
 
 namespace UI.Settings
 {
