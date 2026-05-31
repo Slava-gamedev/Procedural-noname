@@ -1,16 +1,21 @@
 using UI;
+using UI.Settings;
+using Unity.VisualScripting;
 using UnityEngine;
 using Zenject;
 
 public class MainInstaller : MonoInstaller
 {
     [SerializeField] AddressablePopupProvider _popupProvider;
+    [SerializeField] UIPrefabProvider _uiPrefabProvider;
+
     public override void InstallBindings()
     {
         BindServicesAndManagers();
         BindListeners();
         BindProviders();
         BindUIDependencies();
+        BindControllers();
         BindUI();
     }
 
@@ -32,7 +37,8 @@ public class MainInstaller : MonoInstaller
 
     private void BindProviders()
     {
-        Container.Bind<IAddressablePopupProvider>().FromInstance(_popupProvider).AsSingle();
+        Container.Bind<IPopupProvider>().FromInstance(_popupProvider).AsSingle();
+        Container.Bind<IUIPrefabProvider>().FromInstance(_uiPrefabProvider).AsSingle();
     }
 
     private void BindUI()
@@ -45,6 +51,11 @@ public class MainInstaller : MonoInstaller
 
         Container.Bind<LevelPausePopupMediator>().To<LevelPausePopupMediator>().AsTransient();
         Container.Bind<LevelPausePopupController>().To<LevelPausePopupController>().AsTransient();
+    }
+
+    private void BindControllers()
+    {
+        Container.Bind<IKeyRebindingController>().To<KeyRebindingController>().AsTransient();
     }
 
     private void BindUIDependencies()

@@ -9,12 +9,15 @@ namespace UI.Settings
     {
         public Action OnRebindPressed;
         public Action OnResetPressed;
+        public string LabelText => _actionLabel.text;
 
         [SerializeField] private TMP_Text _actionLabel;
         [SerializeField] private TMP_Text _rebindButtonText;
         [SerializeField] private Button _rebindButton;
         [SerializeField] private TMP_Text _resetButtonText;
         [SerializeField] private Button _resetToDefaultButton;
+
+
 
         public void SetLabelText(string labelText)
         {

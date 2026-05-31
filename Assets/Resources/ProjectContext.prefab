@@ -75,3 +75,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _popupProvider: {fileID: 11400000, guid: a1faced5d130c8d43a09311acd441896, type: 2}
+  _uiPrefabProvider: {fileID: 11400000, guid: 8b45cf84a199a5048b69b6d114eb8b0e, type: 2}

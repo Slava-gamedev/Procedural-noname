@@ -9,22 +9,14 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bb1288a041c9c90478c73f6296f441ec, type: 3}
-  m_Name: AddressablePopupProvider
+  m_Script: {fileID: 11500000, guid: df19380fa6291904dab95c466cabe816, type: 3}
+  m_Name: UIPrefabProvider
   m_EditorClassIdentifier: 
   _gameObjects:
-  - <Type>k__BackingField: 1
+  - <Type>k__BackingField: 0
     <Loader>k__BackingField:
       _reference:
-        m_AssetGUID: cc7d5d38d7809ab4396d18bb2b786538
-        m_SubObjectName: 
-        m_SubObjectType: 
-        m_SubObjectGUID: 
-        m_EditorAssetChanged: 0
-  - <Type>k__BackingField: 2
-    <Loader>k__BackingField:
-      _reference:
-        m_AssetGUID: 80e5a8b0250ae2440830cbbb53eade2b
+        m_AssetGUID: 28e24e253c4b50d4d93b0efa1673f73b
         m_SubObjectName: 
         m_SubObjectType: 
         m_SubObjectGUID: 

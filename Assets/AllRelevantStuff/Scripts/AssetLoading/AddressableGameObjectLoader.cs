@@ -8,8 +8,8 @@ public class AddressableGameObjectLoader : BaseAddressableLoader<GameObject, Ass
 }
 
 [Serializable]
-public class GameObjectMapper<T>
+public class GameObjectMapper<TType> where TType : Enum
 {
-    [field: SerializeField] public T Type { get; private set; }
+    [field: SerializeField] public TType Type { get; private set; }
     [field: SerializeField] public AddressableGameObjectLoader Loader { get; private set; }
 }

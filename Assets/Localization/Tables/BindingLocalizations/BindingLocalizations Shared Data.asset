@@ -1,0 +1,48 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: BindingLocalizations Shared Data
+  m_EditorClassIdentifier: 
+  m_TableCollectionName: BindingLocalizations
+  m_TableCollectionNameGuidString: ea7bdfc73387dfb41b6b29bf1035db7b
+  m_Entries:
+  - m_Id: 7652126720
+    m_Key: Jump
+    m_Metadata:
+      m_Items: []
+  - m_Id: 43068829696
+    m_Key: Move_Negative
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28312036061184
+    m_Key: Move_Positive
+    m_Metadata:
+      m_Items: []
+  - m_Id: 7260509712384
+    m_Key: Reset
+    m_Metadata:
+      m_Items: []
+  - m_Id: 28455804219392
+    m_Key: WaitingForInput
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 899028485371854922
+  references:
+    version: 2
+    RefIds:
+    - rid: 899028485371854922
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1780211615865

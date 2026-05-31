@@ -23,7 +23,7 @@ namespace UI
         protected abstract PopupType _popupType { get; }
 
         protected readonly IUIManager _UIManager;
-        protected readonly IAddressablePopupProvider _popupProvider;
+        protected readonly IPopupProvider _popupProvider;
         protected TView _view;
 
         public event Action OnClosedPopup;
@@ -36,7 +36,7 @@ namespace UI
 
         public virtual async UniTask InitPopup(Camera camera, Transform parent, int orderLayer = 0)
         {
-            _view = await _popupProvider.InstantiatePopupAsync<TView>(parent,_popupType);
+            _view = await _popupProvider.InstantiateAsync<TView>(parent,_popupType);
             _view.Init(camera, orderLayer);
         }
 
@@ -77,10 +77,10 @@ namespace UI
     {
         public IUIManager UIManager { get; }
 
-        public IAddressablePopupProvider PopupProvider {  get; }
+        public IPopupProvider PopupProvider {  get; }
 
 
-        public PopupMediatorDependenices(IUIManager uIManager, IAddressablePopupProvider popupProvider)
+        public PopupMediatorDependenices(IUIManager uIManager, IPopupProvider popupProvider)
         {
             UIManager = uIManager;
             PopupProvider = popupProvider;

@@ -15,6 +15,11 @@ MonoBehaviour:
   m_GroupName: Default Local Group
   m_GUID: 6aa0e9e5b68b17c49960fa45c79e6767
   m_SerializeEntries:
+  - m_GUID: 28e24e253c4b50d4d93b0efa1673f73b
+    m_Address: Assets/AllRelevantStuff/Prefabs/UIPrefabs/RebindAction.prefab
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+    FlaggedDuringContentUpdateRestriction: 0
   - m_GUID: 80e5a8b0250ae2440830cbbb53eade2b
     m_Address: Assets/AllRelevantStuff/Prefabs/PauseLevelPopup.prefab
     m_ReadOnly: 0

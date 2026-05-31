@@ -1,4 +1,6 @@
 using Cysharp.Threading.Tasks;
+using UI;
+using UI.Settings;
 using UnityEngine;
 
 
@@ -12,16 +14,19 @@ public class MainMenuSceneMediator : BaseSceneMediator<MainMenuSceneView>
 
     protected override string SceneName => "MainMenu";
 
+
     private readonly ILevelDataService _levelDataService;
     private readonly ILocalizationManager _localizationManager;
     private readonly IEventBus _eventBus;
+    private readonly IKeyRebindingController _rebindingController;
 
     public MainMenuSceneMediator(SceneMediatorDependenices dependenices, ILevelDataService levelDataService,
-        IEventBus eventBus) : base(dependenices)
+        IEventBus eventBus, IKeyRebindingController rebindingController) : base(dependenices)
     {
         _levelDataService = levelDataService;
         _localizationManager = dependenices.LocalizationManager;
         _eventBus = eventBus;
+        _rebindingController = rebindingController;
     }
 
     protected override async UniTask DoOnInit()
@@ -63,12 +68,16 @@ public class MainMenuSceneMediator : BaseSceneMediator<MainMenuSceneView>
     {
         _view.MainMenuView.Hide();
         _view.SettingsMenuView.Show();
+
+        RebindOverlayMapper mapper = _view.SettingsMenuView.RebindOverlayMapper;
+        _rebindingController.Init(InputReader.Actions.InGame, mapper);
     }
 
     private void OnSettingClosed()
     {
         _view.MainMenuView.Show();
         _view.SettingsMenuView.Hide();
+        _rebindingController.Release();
     }
 
     private async void OnPlayClicked()

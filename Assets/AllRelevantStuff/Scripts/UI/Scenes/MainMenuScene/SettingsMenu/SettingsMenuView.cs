@@ -8,6 +8,8 @@ namespace UI
     public class SettingsMenuView : MonoBehaviour
     {
         public event Action OnBackPressed;
+        public RebindOverlayMapper RebindOverlayMapper => _rebindOverlayMapper;
+
 
         [SerializeField] private Button _backButton;
         [SerializeField] private TMP_Text _backText;
@@ -56,5 +58,6 @@ namespace UI
     {
         public TMP_Text RebindOverlayText;
         public GameObject RebindOverlay;
+        public Transform SpawnParent;
     }
 }
